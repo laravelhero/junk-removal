@@ -1,0 +1,151 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   CLEAROUT JUNK REMOVAL — Design Tokens
+   Industrial charcoal/slate + tactical amber accent system
+   ============================================================ */
+@theme {
+  /* Brand neutrals — deep industrial charcoal */
+  --color-ink-950: #0b0f19;
+  --color-ink-900: #111827;
+  --color-ink-800: #1c2433;
+  --color-ink-700: #29303f;
+  --color-ink-600: #3a4254;
+
+  /* Tactical amber accent */
+  --color-amber-bright: #fbbf24;
+  --color-amber-core: #f59e0b;
+  --color-amber-deep: #d97706;
+
+  /* Supporting neutrals */
+  --color-bone: #f7f6f3;
+  --color-bone-200: #ece9e3;
+
+  /* Typography */
+  --font-display: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Easing */
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Self-host-free webfonts via Google CDN for the display + body stack */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 600 900;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/archivo/v19/k3k6o8UDI-1M0wlSV9XAw6lQkqWY8Q82sJaRE-NWIDdgffTTNDNZ9xdp.woff2')
+    format('woff2');
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bone);
+  color: var(--color-ink-900);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headings get the condensed industrial face */
+h1,
+h2,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================
+   Reusable component classes
+   ============================================================ */
+@layer components {
+  .container-edge {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10;
+  }
+
+  /* Primary tactical CTA */
+  .btn-amber {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-amber-core px-7 py-3.5
+           text-sm font-bold uppercase tracking-wide text-ink-950 shadow-lg shadow-amber-core/20
+           transition duration-200 hover:bg-amber-bright hover:shadow-amber-bright/30
+           hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]
+           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+           focus-visible:outline-amber-bright;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-white/20
+           bg-white/5 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white
+           backdrop-blur transition duration-200 hover:border-amber-core hover:text-amber-bright
+           active:scale-[0.98];
+  }
+
+  .btn-dark {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-ink-900 px-7 py-3.5
+           text-sm font-bold uppercase tracking-wide text-white transition duration-200
+           hover:bg-ink-800 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98];
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-deep;
+  }
+
+  /* Animated underline accent under section eyebrows */
+  .accent-rule {
+    @apply mt-3 h-1 w-14 rounded-full bg-amber-core;
+  }
+
+  .card-lift {
+    @apply transition duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-ink-900/10;
+  }
+
+  /* Link with sliding amber underline */
+  .nav-link {
+    @apply relative text-sm font-semibold uppercase tracking-wide text-white/80 transition
+           hover:text-white;
+  }
+  .nav-link::after {
+    content: '';
+    @apply absolute -bottom-1.5 left-0 h-0.5 w-0 bg-amber-core transition-all duration-300;
+  }
+  .nav-link:hover::after,
+  .nav-link[aria-current='page']::after {
+    @apply w-full;
+  }
+  .nav-link[aria-current='page'] {
+    @apply text-amber-bright;
+  }
+}
+
+/* Reveal-on-scroll for elements tagged with [data-reveal] (progressive enhancement) */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s var(--ease-snap);
+  }
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hide elements until Alpine has initialized to prevent flicker */
+[x-cloak] {
+  display: none !important;
+}
+
+/* Subtle diagonal texture utility for dark blocks */
+.texture-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+}

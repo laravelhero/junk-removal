@@ -1,0 +1,66 @@
+{
+    "site": {
+        "name": "Apex Junk Removal",
+        "production_url": "https://apexjunk.com"
+    },
+    "pages": [
+        {
+            "title": "Home",
+            "slug": "index",
+            "is_home": true,
+            "meta": {
+                "title": "Hic reiciendis aut eos",
+                "description": "Aut aliquid in laudantium iste."
+            },
+            "sections": [
+                {
+                    "type": "hero",
+                    "heading": "Stand-alone non-volatile structure",
+                    "subheading": "Ut aliquid accusamus voluptatem maiores consequatur.",
+                    "cta_label": "Get a Free Quote",
+                    "cta_url": "/contact"
+                },
+                {
+                    "type": "features-grid",
+                    "heading": "Why Choose Us",
+                    "features": [
+                        {
+                            "icon": "heroicon-o-bolt",
+                            "title": "Fast Service",
+                            "description": "At eius saepe cupiditate alias nesciunt consequatur et."
+                        },
+                        {
+                            "icon": "heroicon-o-shield-check",
+                            "title": "Fully Insured",
+                            "description": "Quia nemo impedit ipsum commodi eaque ad."
+                        }
+                    ]
+                },
+                {
+                    "type": "cta",
+                    "heading": "Ready to get started?",
+                    "button_label": "Book Now",
+                    "button_url": "/contact"
+                }
+            ]
+        },
+        {
+            "title": "Furniture Removal",
+            "slug": "services/furniture-removal",
+            "is_home": false,
+            "meta": {
+                "title": "Magni et voluptatibus",
+                "description": "Minima et qui quasi laborum."
+            },
+            "sections": [
+                {
+                    "type": "hero",
+                    "heading": "Triple-buffered impactful product",
+                    "subheading": "Accusamus adipisci quia iusto eum ut quo.",
+                    "cta_label": "Get a Free Quote",
+                    "cta_url": "/contact"
+                }
+            ]
+        }
+    ]
+}

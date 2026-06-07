@@ -1,0 +1,154 @@
+---
+import { business, primaryNav, services } from '../data/site';
+import Icon from './Icon.astro';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+---
+
+<header
+  x-data="{ scrolled: false, mobile: false }"
+  x-init="scrolled = window.scrollY > 20; window.addEventListener('scroll', () => scrolled = window.scrollY > 20)"
+  :class="scrolled ? 'bg-ink-950/95 shadow-lg shadow-black/30 backdrop-blur-md' : 'bg-ink-950/80'"
+  class="fixed inset-x-0 top-0 z-50 border-b border-white/5 transition-colors duration-300"
+>
+  <div class="container-edge">
+    <div class="flex h-[72px] items-center justify-between gap-4">
+      <!-- Logo -->
+      <a href="/" class="group flex items-center gap-3" aria-label={`${business.name} home`}>
+        <span class="flex h-10 w-10 items-center justify-center rounded-md bg-amber-core text-ink-950 transition group-hover:scale-105">
+          <Icon name="truck" class="h-6 w-6" stroke={1.8} />
+        </span>
+        <span class="leading-none">
+          <span class="block font-display text-2xl font-extrabold tracking-tight text-white">
+            CLEAR<span class="text-amber-core">OUT</span>
+          </span>
+          <span class="block text-[10px] font-semibold uppercase tracking-[0.3em] text-white/50">
+            Junk Removal
+          </span>
+        </span>
+      </a>
+
+      <!-- Desktop nav -->
+      <nav class="hidden items-center gap-7 lg:flex" aria-label="Primary">
+        {
+          primaryNav.map((item) =>
+            'hasMenu' in item && item.hasMenu ? (
+              <div x-data="{ open: false }" class="relative" @mouseenter="open = true" @mouseleave="open = false">
+                <a
+                  href={item.href}
+                  class="nav-link flex items-center gap-1"
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                >
+                  {item.label}
+                  <Icon name="chevron-down" class="h-3.5 w-3.5" stroke={2.2} />
+                </a>
+                <div
+                  x-show="open"
+                  x-cloak
+                  x-transition.opacity.duration.150ms
+                  class="absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-4"
+                >
+                  <div class="overflow-hidden rounded-xl border border-white/10 bg-ink-900 p-2 shadow-2xl shadow-black/50">
+                    <a href="/services" class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-amber-core hover:bg-white/5">
+                      All Services
+                    </a>
+                    {services.map((s) => (
+                      <a
+                        href={`/services/${s.slug}`}
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/80 transition hover:bg-white/5 hover:text-white"
+                      >
+                        <span class="text-amber-core">
+                          <Icon name={s.icon} class="h-5 w-5" />
+                        </span>
+                        {s.title}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <a
+                href={item.href}
+                class="nav-link"
+                aria-current={isActive(item.href) ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            )
+          )
+        }
+      </nav>
+
+      <!-- Phone + CTA -->
+      <div class="flex items-center gap-3">
+        <a
+          href={business.phoneHref}
+          class="hidden items-center gap-2 text-sm font-semibold text-white xl:flex"
+        >
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-amber-core">
+            <Icon name="phone" class="h-4 w-4" />
+          </span>
+          {business.phone}
+        </a>
+        <button
+          @click="$dispatch('open-booking')"
+          class="btn-amber hidden px-5 py-2.5 sm:inline-flex"
+        >
+          Book Now
+        </button>
+
+        <!-- Mobile toggle -->
+        <button
+          @click="mobile = !mobile"
+          class="flex h-10 w-10 items-center justify-center rounded-md bg-white/10 text-white lg:hidden"
+          aria-label="Toggle menu"
+        >
+          <Icon name="menu" x-show="!mobile" class="h-6 w-6" />
+          <Icon name="x" x-show="mobile" x-cloak class="h-6 w-6" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div
+    x-show="mobile"
+    x-cloak
+    x-transition.opacity
+    @click="mobile = false"
+    class="fixed inset-0 top-[72px] z-40 bg-black/60 lg:hidden"
+  >
+  </div>
+  <nav
+    x-show="mobile"
+    x-cloak
+    x-transition:enter="transition duration-200 ease-out"
+    x-transition:enter-start="-translate-y-4 opacity-0"
+    x-transition:enter-end="translate-y-0 opacity-100"
+    class="absolute inset-x-0 top-[72px] z-50 max-h-[80vh] overflow-y-auto border-t border-white/10 bg-ink-950 px-5 pb-8 pt-2 lg:hidden"
+    aria-label="Mobile"
+  >
+    {
+      primaryNav.map((item) => (
+        <a
+          href={item.href}
+          class="flex items-center justify-between border-b border-white/5 py-3.5 text-base font-semibold text-white/85"
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+          <Icon name="arrow-right" class="h-4 w-4 text-amber-core" />
+        </a>
+      ))
+    }
+    <div class="mt-5 grid grid-cols-2 gap-3">
+      <a href={business.phoneHref} class="btn-ghost py-3">Call Now</a>
+      <button @click="mobile = false; $dispatch('open-booking')" class="btn-amber py-3">
+        Free Quote
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- Spacer so fixed header doesn't overlap page content -->
+<div class="h-[72px]"></div>

@@ -1,0 +1,223 @@
+---
+import { business, services } from '../data/site';
+import Icon from './Icon.astro';
+---
+
+<!--
+  Global multi-step booking modal. Opened from anywhere on the site by
+  dispatching the `open-booking` browser event (buttons use
+  @click="$dispatch('open-booking')"). Pure Alpine — no backend required;
+  the final step renders a summary the visitor can confirm.
+-->
+<div
+  x-data="bookingModal()"
+  @open-booking.window="open()"
+  @keydown.escape.window="show && close()"
+  x-show="show"
+  x-cloak
+  class="fixed inset-0 z-[100] flex items-end justify-center sm:items-center"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Book a junk removal quote"
+>
+  <!-- Backdrop -->
+  <div
+    x-show="show"
+    x-transition.opacity
+    @click="close()"
+    class="absolute inset-0 bg-ink-950/80 backdrop-blur-sm"
+  >
+  </div>
+
+  <!-- Panel -->
+  <div
+    x-show="show"
+    x-transition:enter="transition duration-300 ease-out"
+    x-transition:enter-start="translate-y-8 opacity-0 sm:scale-95"
+    x-transition:enter-end="translate-y-0 opacity-100 sm:scale-100"
+    class="relative z-10 flex max-h-[92vh] w-full max-w-xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl"
+  >
+    <!-- Header / progress -->
+    <div class="bg-ink-950 px-6 pb-5 pt-6 text-white">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="eyebrow text-amber-bright">Free Quote</p>
+          <h2 class="mt-1 font-display text-2xl font-extrabold">Book Your Pickup</h2>
+        </div>
+        <button @click="close()" class="rounded-full p-1.5 text-white/60 hover:bg-white/10 hover:text-white" aria-label="Close">
+          <Icon name="x" class="h-6 w-6" />
+        </button>
+      </div>
+      <!-- Stepper -->
+      <div class="mt-5 flex items-center gap-2">
+        <template x-for="(label, i) in steps" :key="i">
+          <div class="flex flex-1 items-center gap-2">
+            <div class="flex w-full flex-col gap-1.5">
+              <div
+                class="h-1.5 rounded-full transition-all duration-300"
+                :class="i <= step ? 'bg-amber-core' : 'bg-white/15'"
+              >
+              </div>
+              <span class="text-[10px] font-semibold uppercase tracking-wider" :class="i <= step ? 'text-amber-bright' : 'text-white/40'" x-text="label"></span>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-6 py-6">
+      <!-- STEP 0 — What are we hauling? -->
+      <div x-show="step === 0">
+        <h3 class="font-display text-lg font-bold text-ink-900">What are we hauling?</h3>
+        <p class="mt-1 text-sm text-ink-600">Select all that apply.</p>
+        <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {
+            services.map((s) => (
+              <button
+                type="button"
+                @click={`toggleItem('${s.title}')`}
+                :class={`items.includes('${s.title}') ? 'border-amber-core bg-amber-50 ring-2 ring-amber-core/30' : 'border-ink-800/10 hover:border-amber-core/50'`}
+                class="flex flex-col items-center gap-2 rounded-xl border-2 bg-white p-3 text-center transition"
+              >
+                <span class="text-amber-deep">
+                  <Icon name={s.icon} class="h-7 w-7" />
+                </span>
+                <span class="text-xs font-semibold text-ink-800">{s.title}</span>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- STEP 1 — Estimate the load -->
+      <div x-show="step === 1" x-cloak>
+        <h3 class="font-display text-lg font-bold text-ink-900">How much is there?</h3>
+        <p class="mt-1 text-sm text-ink-600">Adjust the truckload meter — most jobs land between ⅛ and a full load.</p>
+
+        <div class="mt-6 rounded-2xl bg-bone p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-semibold text-ink-700">Truckload size</span>
+            <span class="rounded-full bg-ink-900 px-3 py-1 text-sm font-bold text-amber-bright" x-text="loadLabels[load]"></span>
+          </div>
+          <!-- Visual truck fill -->
+          <div class="mt-4 h-7 overflow-hidden rounded-md border border-ink-900/10 bg-white">
+            <div class="h-full bg-amber-core transition-all duration-300" :style="`width: ${(load + 1) * 20}%`"></div>
+          </div>
+          <div class="mt-4 flex items-center justify-between gap-3">
+            <button type="button" @click="load = Math.max(0, load - 1)" class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink-900 shadow hover:bg-ink-900 hover:text-white">
+              <Icon name="minus" class="h-5 w-5" />
+            </button>
+            <input type="range" min="0" max="4" x-model.number="load" class="h-2 flex-1 accent-amber-core" />
+            <button type="button" @click="load = Math.min(4, load + 1)" class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink-900 shadow hover:bg-ink-900 hover:text-white">
+              <Icon name="plus" class="h-5 w-5" />
+            </button>
+          </div>
+          <p class="mt-4 text-center text-sm text-ink-600">
+            Estimated range:
+            <span class="font-bold text-ink-900" x-text="priceRanges[load]"></span>
+          </p>
+        </div>
+      </div>
+
+      <!-- STEP 2 — Schedule + contact -->
+      <div x-show="step === 2" x-cloak class="space-y-4">
+        <h3 class="font-display text-lg font-bold text-ink-900">Where & when?</h3>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label class="block">
+            <span class="text-xs font-semibold uppercase tracking-wide text-ink-600">Full name</span>
+            <input x-model="form.name" type="text" placeholder="Jane Doe" class="mt-1.5 w-full rounded-lg border border-ink-900/15 px-3 py-2.5 text-sm focus:border-amber-core focus:outline-none focus:ring-2 focus:ring-amber-core/20" />
+          </label>
+          <label class="block">
+            <span class="text-xs font-semibold uppercase tracking-wide text-ink-600">Phone</span>
+            <input x-model="form.phone" type="tel" placeholder="(608) 555-0123" class="mt-1.5 w-full rounded-lg border border-ink-900/15 px-3 py-2.5 text-sm focus:border-amber-core focus:outline-none focus:ring-2 focus:ring-amber-core/20" />
+          </label>
+        </div>
+        <label class="block">
+          <span class="text-xs font-semibold uppercase tracking-wide text-ink-600">Pickup address (ZIP)</span>
+          <input x-model="form.zip" type="text" placeholder="53713" class="mt-1.5 w-full rounded-lg border border-ink-900/15 px-3 py-2.5 text-sm focus:border-amber-core focus:outline-none focus:ring-2 focus:ring-amber-core/20" />
+        </label>
+        <label class="block">
+          <span class="text-xs font-semibold uppercase tracking-wide text-ink-600">Preferred date</span>
+          <input x-model="form.date" type="date" class="mt-1.5 w-full rounded-lg border border-ink-900/15 px-3 py-2.5 text-sm focus:border-amber-core focus:outline-none focus:ring-2 focus:ring-amber-core/20" />
+        </label>
+      </div>
+
+      <!-- STEP 3 — Confirmation -->
+      <div x-show="step === 3" x-cloak class="text-center">
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-deep">
+          <Icon name="check-circle" class="h-9 w-9" stroke={1.8} />
+        </div>
+        <h3 class="mt-4 font-display text-2xl font-extrabold text-ink-900">Quote Request Ready!</h3>
+        <p class="mx-auto mt-2 max-w-sm text-sm text-ink-600">
+          Here's your estimate. Confirm and our dispatch team will lock in your slot within the hour.
+        </p>
+        <div class="mt-5 space-y-2 rounded-xl bg-bone p-4 text-left text-sm">
+          <div class="flex justify-between"><span class="text-ink-600">Items</span><span class="font-semibold text-ink-900" x-text="items.length ? items.join(', ') : 'General junk'"></span></div>
+          <div class="flex justify-between"><span class="text-ink-600">Load size</span><span class="font-semibold text-ink-900" x-text="loadLabels[load]"></span></div>
+          <div class="flex justify-between"><span class="text-ink-600">Estimate</span><span class="font-bold text-amber-deep" x-text="priceRanges[load]"></span></div>
+          <div class="flex justify-between"><span class="text-ink-600">Date</span><span class="font-semibold text-ink-900" x-text="form.date || 'Flexible'"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer controls -->
+    <div class="flex items-center justify-between gap-3 border-t border-ink-900/10 bg-white px-6 py-4">
+      <button x-show="step > 0 && step < 3" @click="step--" class="text-sm font-semibold text-ink-600 hover:text-ink-900">
+        ← Back
+      </button>
+      <div x-show="step === 0 || step === 3"></div>
+      <div class="ml-auto flex items-center gap-3">
+        <a x-show="step < 3" href={business.phoneHref} class="hidden text-sm font-semibold text-ink-600 hover:text-ink-900 sm:block">
+          Or call {business.phone}
+        </a>
+        <button
+          x-show="step < 3"
+          @click="next()"
+          class="btn-amber px-6 py-2.5"
+          x-text="step === 2 ? 'Review Quote' : 'Continue'"
+        >
+        </button>
+        <button x-show="step === 3" @click="submit()" class="btn-amber px-6 py-2.5">
+          Confirm Booking
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function bookingModal() {
+    return {
+      show: false,
+      step: 0,
+      load: 1,
+      items: [],
+      steps: ['Items', 'Load', 'Details', 'Done'],
+      loadLabels: ['Minimum', '1/4 Truck', '1/2 Truck', '3/4 Truck', 'Full Truck'],
+      priceRanges: ['$89–$129', '$179–$249', '$289–$369', '$399–$489', '$519–$649'],
+      form: { name: '', phone: '', zip: '', date: '' },
+      open() {
+        this.show = true;
+        document.body.style.overflow = 'hidden';
+      },
+      close() {
+        this.show = false;
+        document.body.style.overflow = '';
+      },
+      toggleItem(item) {
+        this.items = this.items.includes(item)
+          ? this.items.filter((i) => i !== item)
+          : [...this.items, item];
+      },
+      next() {
+        if (this.step < 3) this.step++;
+      },
+      submit() {
+        // In production this would POST to a CRM / dispatch endpoint.
+        this.close();
+        this.step = 0;
+        alert('Thanks! Our dispatch team will call you shortly to confirm your pickup.');
+      },
+    };
+  }
+</script>

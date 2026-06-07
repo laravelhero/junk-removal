@@ -1,0 +1,139 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { posts, formatDate } from '../../data/posts';
+import { business } from '../../data/site';
+
+export function getStaticPaths() {
+  return posts.map((p) => ({ params: { slug: p.slug }, props: { post: p } }));
+}
+
+const { post } = Astro.props;
+const related = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.excerpt,
+  image: post.cover,
+  datePublished: post.date,
+  author: { '@type': 'Person', name: post.author },
+  publisher: {
+    '@type': 'Organization',
+    name: business.name,
+    logo: { '@type': 'ImageObject', url: `${business.url}/favicon.svg` },
+  },
+  mainEntityOfPage: `${business.url}/blog/${post.slug}`,
+};
+---
+
+<Layout title={post.title} description={post.excerpt} path={`/blog/${post.slug}`} image={post.cover}>
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
+
+  <!-- Article header -->
+  <article>
+    <header class="relative overflow-hidden bg-ink-950 text-white">
+      <img src={post.cover} alt="" class="absolute inset-0 h-full w-full object-cover opacity-25" loading="eager" />
+      <div class="absolute inset-0 bg-gradient-to-b from-ink-950/70 via-ink-950/85 to-ink-950"></div>
+      <div class="container-edge relative max-w-3xl py-20 sm:py-24">
+        <nav class="mb-5 flex items-center gap-2 text-xs text-white/50">
+          <a href="/" class="hover:text-amber-bright">Home</a><span>/</span>
+          <a href="/blog" class="hover:text-amber-bright">Blog</a><span>/</span>
+          <span class="text-white/80">{post.category}</span>
+        </nav>
+        <span class="rounded-full bg-amber-core px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-ink-950">
+          {post.category}
+        </span>
+        <h1 class="mt-5 font-display text-4xl font-extrabold leading-[1.08] sm:text-5xl">{post.title}</h1>
+        <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/60">
+          <span class="inline-flex items-center gap-2"><Icon name="users" class="h-4 w-4 text-amber-core" />{post.author}</span>
+          <span class="inline-flex items-center gap-2"><Icon name="calendar" class="h-4 w-4 text-amber-core" />{formatDate(post.date)}</span>
+          <span class="inline-flex items-center gap-2"><Icon name="clock" class="h-4 w-4 text-amber-core" />{post.readMins} min read</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Body -->
+    <div class="bg-white py-14 sm:py-20">
+      <div class="container-edge max-w-3xl">
+        <p class="border-l-4 border-amber-core pl-5 text-xl font-medium leading-relaxed text-ink-800">
+          {post.excerpt}
+        </p>
+        <div class="mt-10 space-y-6">
+          {
+            post.body.map((block) => {
+              if (block.type === 'h2')
+                return <h2 class="pt-4 font-display text-2xl font-extrabold text-ink-900">{block.text}</h2>;
+              if (block.type === 'quote')
+                return (
+                  <blockquote class="rounded-2xl bg-bone p-7 text-lg font-semibold italic text-ink-900">
+                    <span class="font-display text-4xl leading-none text-amber-core">“</span>
+                    {block.text}
+                  </blockquote>
+                );
+              if (block.type === 'ul')
+                return (
+                  <ul class="space-y-3">
+                    {block.items?.map((li) => (
+                      <li class="flex gap-3 text-ink-700">
+                        <span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-core text-ink-950">
+                          <Icon name="check" class="h-3.5 w-3.5" stroke={3} />
+                        </span>
+                        <span>{li}</span>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              return <p class="leading-relaxed text-ink-700">{block.text}</p>;
+            })
+          }
+        </div>
+
+        <!-- Inline CTA -->
+        <div class="mt-12 rounded-2xl bg-ink-950 p-8 text-center text-white texture-grid">
+          <h3 class="font-display text-2xl font-extrabold">Ready to clear it out?</h3>
+          <p class="mx-auto mt-2 max-w-md text-white/60">Get a free, upfront quote and let ClearOut handle the hauling.</p>
+          <button @click="$dispatch('open-booking')" class="btn-amber mt-6">Book Your Free Quote</button>
+        </div>
+
+        <!-- Author chip -->
+        <div class="mt-10 flex items-center gap-4 rounded-2xl border border-ink-900/10 bg-bone p-5">
+          <span class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-core text-ink-950">
+            <Icon name="users" class="h-6 w-6" />
+          </span>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-ink-500">Written by</p>
+            <p class="font-display text-lg font-bold text-ink-900">{post.author}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Related -->
+  <section class="bg-bone py-16 sm:py-20">
+    <div class="container-edge">
+      <div class="flex items-end justify-between">
+        <h2 class="font-display text-2xl font-extrabold text-ink-900 sm:text-3xl">Keep reading</h2>
+        <a href="/blog" class="text-sm font-bold uppercase tracking-wide text-amber-deep hover:text-amber-core">All articles →</a>
+      </div>
+      <div class="mt-8 grid gap-6 sm:grid-cols-3">
+        {
+          related.map((p) => (
+            <a href={`/blog/${p.slug}`} class="card-lift group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink-900/5">
+              <div class="h-40 overflow-hidden">
+                <img src={p.cover} alt={p.title} class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
+              </div>
+              <div class="flex flex-1 flex-col p-5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-deep">{p.category}</span>
+                <h3 class="mt-1.5 font-display text-base font-bold leading-snug text-ink-900">{p.title}</h3>
+                <span class="mt-3 text-xs text-ink-500">{formatDate(p.date)} · {p.readMins} min</span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>

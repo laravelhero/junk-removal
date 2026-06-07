@@ -1,0 +1,172 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+
+// Before/after pairs + standalone job shots. `before`/`after` drive the
+// hover-to-reveal cards; the lightbox opens the full-resolution image.
+const pairs = [
+  {
+    label: 'Garage Cleanout',
+    area: 'Sun Prairie, WI',
+    before: 'https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=1200&q=80',
+    after: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    label: 'Living Room Furniture Haul',
+    area: 'Madison, WI',
+    before: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1200&q=80',
+    after: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    label: 'Basement Clear-Out',
+    area: 'Middleton, WI',
+    before: 'https://images.unsplash.com/photo-1558211583-d26f610c1eb1?auto=format&fit=crop&w=1200&q=80',
+    after: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80',
+  },
+];
+
+const shots = [
+  { src: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80', label: 'Construction debris load', area: 'Fitchburg, WI' },
+  { src: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1200&q=80', label: 'Yard waste & brush', area: 'Verona, WI' },
+  { src: 'https://images.unsplash.com/photo-1581622558663-b2e33377dfb2?auto=format&fit=crop&w=1200&q=80', label: 'Appliance recycling', area: 'Monona, WI' },
+  { src: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=80', label: 'Crew loading the truck', area: 'Madison, WI' },
+  { src: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80', label: 'Sorted for recycling', area: 'Madison, WI' },
+  { src: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1200&q=80', label: 'Estate cleanout, swept clean', area: 'Stoughton, WI' },
+];
+
+// Flat list of every image for the lightbox, with captions.
+const lightboxImages = [
+  ...pairs.flatMap((p) => [
+    { src: p.before, caption: `${p.label} — Before · ${p.area}` },
+    { src: p.after, caption: `${p.label} — After · ${p.area}` },
+  ]),
+  ...shots.map((s) => ({ src: s.src, caption: `${s.label} · ${s.area}` })),
+];
+---
+
+<Layout
+  title="Before & After Gallery"
+  description="See real before-and-after junk removal results from ClearOut across Madison, WI — garage cleanouts, furniture hauls, basement clear-outs and more, with a full-screen photo viewer."
+  path="/gallery"
+>
+  <PageHero
+    eyebrow="Gallery"
+    title="The proof is in the before & after."
+    subtitle="Drag your eyes from cluttered to clear. Tap any photo to open it full-screen."
+    image="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=2000&q=80"
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Gallery' }]}
+  />
+
+  <div
+    x-data={`{
+      open: false,
+      index: 0,
+      images: ${JSON.stringify(lightboxImages)},
+      show(i) { this.index = i; this.open = true; document.body.style.overflow = 'hidden'; },
+      close() { this.open = false; document.body.style.overflow = ''; },
+      next() { this.index = (this.index + 1) % this.images.length; },
+      prev() { this.index = (this.index - 1 + this.images.length) % this.images.length; },
+    }`}
+    @keydown.window="open && ($event.key === 'ArrowRight' && next(), $event.key === 'ArrowLeft' && prev(), $event.key === 'Escape' && close())"
+  >
+    <!-- Before / after cards -->
+    <section class="bg-white py-16 sm:py-20">
+      <div class="container-edge">
+        <div class="text-center">
+          <p class="eyebrow justify-center">Transformations</p>
+          <div class="accent-rule mx-auto"></div>
+          <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">Hover to reveal the after.</h2>
+        </div>
+        <div class="mt-12 grid gap-8 lg:grid-cols-3">
+          {
+            pairs.map((p, i) => (
+              <div class="card-lift overflow-hidden rounded-2xl bg-bone shadow-sm ring-1 ring-ink-900/5">
+                <div class="group relative aspect-[4/3] overflow-hidden">
+                  <img src={p.before} alt={`${p.label} before`} class="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+                  <img src={p.after} alt={`${p.label} after`} class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100" loading="lazy" />
+                  <span class="absolute left-3 top-3 rounded-full bg-ink-950/80 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white transition group-hover:opacity-0">Before</span>
+                  <span class="absolute left-3 top-3 rounded-full bg-amber-core px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-950 opacity-0 transition group-hover:opacity-100">After</span>
+                  <button
+                    @click={`show(${i * 2 + 1})`}
+                    class="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink-900 opacity-0 transition group-hover:opacity-100"
+                    aria-label="Open image"
+                  >
+                    <Icon name="plus" class="h-5 w-5" />
+                  </button>
+                </div>
+                <div class="p-5">
+                  <h3 class="font-display text-lg font-bold text-ink-900">{p.label}</h3>
+                  <p class="text-sm text-ink-500">{p.area}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Job shots grid -->
+    <section class="bg-bone py-16 sm:py-20">
+      <div class="container-edge">
+        <div class="text-center">
+          <p class="eyebrow justify-center">On The Job</p>
+          <div class="accent-rule mx-auto"></div>
+          <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">Out in the field.</h2>
+        </div>
+        <div class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {
+            shots.map((s, i) => (
+              <button
+                @click={`show(${pairs.length * 2 + i})`}
+                class="group relative aspect-square overflow-hidden rounded-2xl"
+              >
+                <img src={s.src} alt={s.label} class="h-full w-full object-cover transition duration-500 group-hover:scale-110" loading="lazy" />
+                <div class="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent opacity-0 transition group-hover:opacity-100"></div>
+                <div class="absolute bottom-0 left-0 p-4 text-left opacity-0 transition group-hover:opacity-100">
+                  <p class="font-display text-sm font-bold text-white">{s.label}</p>
+                  <p class="text-xs text-white/70">{s.area}</p>
+                </div>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div
+      x-show="open"
+      x-cloak
+      x-transition.opacity
+      class="fixed inset-0 z-[120] flex items-center justify-center bg-ink-950/95 p-4"
+      @click.self="close()"
+    >
+      <button @click="close()" class="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20" aria-label="Close">
+        <Icon name="x" class="h-6 w-6" />
+      </button>
+      <button @click="prev()" class="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 sm:left-8" aria-label="Previous">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button @click="next()" class="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 sm:right-8" aria-label="Next">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <figure class="max-h-[85vh] max-w-4xl">
+        <img :src="images[index].src" :alt="images[index].caption" class="max-h-[78vh] w-auto rounded-xl object-contain shadow-2xl" />
+        <figcaption class="mt-4 text-center text-sm text-white/70">
+          <span x-text="images[index].caption"></span>
+          <span class="ml-2 text-white/40" x-text="`(${index + 1} / ${images.length})`"></span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <section class="bg-ink-950 py-16 texture-grid">
+    <div class="container-edge text-center">
+      <h2 class="font-display text-3xl font-extrabold text-white sm:text-4xl">Picture your space, cleared.</h2>
+      <p class="mx-auto mt-3 max-w-xl text-white/60">Book a free quote and we'll make the after happen.</p>
+      <button @click="$dispatch('open-booking')" class="btn-amber mt-8">Book Your Free Quote</button>
+    </div>
+  </section>
+</Layout>

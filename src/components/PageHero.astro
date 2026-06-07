@@ -1,0 +1,54 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
+  image?: string;
+  crumbs?: { label: string; href?: string }[];
+}
+const {
+  eyebrow,
+  title,
+  subtitle,
+  image = 'https://images.unsplash.com/photo-1600518464441-9154a4dea21b?auto=format&fit=crop&w=2000&q=80',
+  crumbs = [],
+} = Astro.props;
+---
+
+<section class="relative overflow-hidden bg-ink-950 text-white">
+  <img src={image} alt="" class="absolute inset-0 h-full w-full object-cover opacity-25" loading="eager" />
+  <div class="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/90 to-ink-950/50"></div>
+  <div class="texture-grid absolute inset-0 opacity-60"></div>
+  <div class="container-edge relative py-20 sm:py-24">
+    {
+      crumbs.length > 0 && (
+        <nav class="mb-5 flex items-center gap-2 text-xs font-medium text-white/50" aria-label="Breadcrumb">
+          {crumbs.map((c, i) => (
+            <>
+              {c.href ? (
+                <a href={c.href} class="hover:text-amber-bright">{c.label}</a>
+              ) : (
+                <span class="text-white/80">{c.label}</span>
+              )}
+              {i < crumbs.length - 1 && <span class="text-white/30">/</span>}
+            </>
+          ))}
+        </nav>
+      )
+    }
+    <p class="eyebrow text-amber-bright">
+      <span class="h-px w-6 bg-amber-core"></span>{eyebrow}
+    </p>
+    <h1 class="mt-4 max-w-3xl font-display text-4xl font-extrabold leading-[1.05] sm:text-6xl">
+      {title}
+    </h1>
+    {subtitle && <p class="mt-5 max-w-2xl text-lg text-white/70">{subtitle}</p>}
+    <div class="mt-8 flex flex-wrap gap-3">
+      <button @click="$dispatch('open-booking')" class="btn-amber">
+        Book Your Free Quote <Icon name="arrow-right" class="h-4 w-4" />
+      </button>
+      <a href="/services" class="btn-ghost">View All Services</a>
+    </div>
+  </div>
+</section>

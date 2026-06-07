@@ -1,0 +1,91 @@
+---
+/**
+ * Inline SVG icon set — crisp custom geometric line-art only.
+ * All glyphs share a 24×24 viewBox, 1.6 stroke, round caps/joins so they
+ * read as one cohesive tactical family. No external icon library.
+ */
+interface Props {
+  name: string;
+  class?: string;
+  stroke?: number;
+  /** Set to "currentColor" for solid glyphs like filled stars */
+  fill?: string;
+  /** Any extra attributes (x-show, @click, aria-*, …) are forwarded to the <svg> */
+  [key: string]: unknown;
+}
+const { name, class: cls = 'h-7 w-7', stroke = 1.6, fill = 'none', ...rest } = Astro.props;
+
+const paths: Record<string, string> = {
+  // Furniture — a sofa
+  sofa: '<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M4 11a2 2 0 0 0-2 2v3h20v-3a2 2 0 0 0-2-2 2 2 0 0 0-2 2v1H6v-1a2 2 0 0 0-2-2Z"/><path d="M5 19v1M19 19v1"/>',
+  // Appliance — washer / fridge stack
+  appliance: '<rect x="5" y="3" width="14" height="18" rx="1.5"/><line x1="5" y1="8" x2="19" y2="8"/><circle cx="12" cy="14.5" r="3"/><line x1="8" y1="5.5" x2="9.5" y2="5.5"/>',
+  // Garage — house with up-door
+  garage: '<path d="M3 21V9l9-5 9 5v12"/><rect x="7" y="11" width="10" height="10" rx="0.5"/><line x1="7" y1="14.5" x2="17" y2="14.5"/><line x1="7" y1="18" x2="17" y2="18"/>',
+  // Construction debris — broken planks
+  debris: '<path d="M3 20h18"/><path d="M5 20l3-9 4 1-2 8"/><path d="M14 20l1-7 5 2-1 5"/><path d="M8 11l1.5-3"/>',
+  // Yard waste — bagged leaves
+  leaf: '<path d="M7 21h10l1-9H6l1 9Z"/><path d="M9 12V9a3 3 0 0 1 6 0v3"/><path d="M16 6c-2 .5-3 2-3 4 2 0 3.5-1.4 3.5-4Z"/>',
+  // Estate — house with key
+  house: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><rect x="10" y="13" width="4" height="7"/>',
+  // Truck
+  truck: '<path d="M2 6h11v9H2z"/><path d="M13 9h4l3 3v3h-7z"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+  // Recycle
+  recycle: '<path d="M7 19h10a2 2 0 0 0 1.7-3l-1.2-2"/><path d="M12 4l-2.5 4.3L6 6.5"/><path d="M5.3 9.5 4 12a2 2 0 0 0 1.7 3H8"/><path d="M19 12l1.3 2.3M12 4h2.8L17 8"/>',
+  // Phone
+  phone: '<path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L19 13l2 5v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1Z"/>',
+  // Thumbs up
+  thumb: '<path d="M7 11v8H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/><path d="M7 11l4-7a2 2 0 0 1 2 2v3h5a2 2 0 0 1 2 2.3l-1 5A2 2 0 0 1 18 19H7"/>',
+  // Check
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  // Check in circle
+  'check-circle': '<circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
+  // Star
+  star: '<path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8L6.6 19.6l1-6L3.3 9.4l6-.9Z"/>',
+  // Arrow right
+  'arrow-right': '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
+  // Leaf / donate (heart)
+  heart: '<path d="M12 20s-7-4.3-7-9.5A4 4 0 0 1 12 7a4 4 0 0 1 7 3.5C19 15.7 12 20 12 20Z"/>',
+  // Shield / licensed
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6Z"/><path d="M9 12l2 2 4-4"/>',
+  // Clock
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  // Map pin
+  pin: '<path d="M12 21s7-5.6 7-11a7 7 0 0 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/>',
+  // Mail
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  // Tag / pricing
+  tag: '<path d="M3 12V4h8l9 9-7 7-9-9Z"/><circle cx="7.5" cy="7.5" r="1.3"/>',
+  // Scale / weight
+  scale: '<path d="M12 4v16M7 20h10"/><path d="M5 8h14"/><path d="M5 8 2 14a3 3 0 0 0 6 0Z"/><path d="M19 8l-3 6a3 3 0 0 0 6 0Z"/>',
+  // Calendar
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>',
+  // Box / volume
+  box: '<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/>',
+  // Plus / minus for steppers
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  minus: '<path d="M5 12h14"/>',
+  // X close
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  // Chevron down
+  'chevron-down': '<path d="m6 9 6 6 6-6"/>',
+  // Menu
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  // Users / team
+  users: '<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6a3 3 0 0 1 0 5.5M21 20a6 6 0 0 0-4-5.6"/>',
+};
+
+const d = paths[name] ?? '';
+---
+<svg
+  class={cls}
+  viewBox="0 0 24 24"
+  fill={fill}
+  stroke="currentColor"
+  stroke-width={stroke}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  {...rest}
+  set:html={d}
+/>

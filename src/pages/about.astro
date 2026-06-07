@@ -1,0 +1,226 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { business } from '../data/site';
+
+const team = [
+  {
+    name: 'Ray Delgado',
+    role: 'Founder & Lead Hauler',
+    img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80',
+    bio: 'Started ClearOut with one truck in 2014. Still rides along on the big estate jobs.',
+  },
+  {
+    name: 'Marcus Webb',
+    role: 'Operations Manager',
+    img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+    bio: 'Keeps every crew on schedule and every quote honest. Logistics wizard.',
+  },
+  {
+    name: 'Tasha Greer',
+    role: 'Donation Coordinator',
+    img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80',
+    bio: 'Routes every reusable item to the right local charity partner.',
+  },
+  {
+    name: 'Diego Santos',
+    role: 'Crew Lead',
+    img: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=600&q=80',
+    bio: 'Ten years on the truck. Treats every home like it’s his grandmother’s.',
+  },
+];
+
+const metrics = [
+  { value: '2014', label: 'Locally Owned Since' },
+  { value: '12,400+', label: 'Loads Hauled' },
+  { value: '68%', label: 'Landfill Diversion Rate' },
+  { value: '4.6★', label: '150+ Google Reviews' },
+];
+
+const credentials = [
+  { icon: 'shield', t: 'Licensed & Bonded', d: `Operating under ${business.legalName}, fully licensed for residential & commercial hauling in ${business.address.regionName}.` },
+  { icon: 'check-circle', t: '$2M Liability Insurance', d: 'Comprehensive general liability and workers’ comp coverage protects your property on every job.' },
+  { icon: 'users', t: 'Background-Checked Crews', d: 'Every team member is vetted, uniformed and trained in safe-lifting and damage-free removal.' },
+  { icon: 'recycle', t: 'DNR-Compliant Disposal', d: 'We follow Wisconsin DNR guidelines for e-waste, appliances with refrigerants, and hazardous separation.' },
+];
+---
+
+<Layout
+  title="About Us — Local, Insured & Eco-Driven"
+  description="Locally owned since 2014, ClearOut Junk Removal is a licensed, insured hauling company serving Madison, WI with eco-friendly disposal, donation routing and a 68% landfill diversion rate."
+  path="/about"
+>
+  <PageHero
+    eyebrow="About ClearOut"
+    title="Junk hauling built on respect — for your home and the planet."
+    subtitle="We're a locally owned crew that treats your stuff, your property and your community the way it should be treated."
+    image="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=2000&q=80"
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'About Us' }]}
+  />
+
+  <!-- Story -->
+  <section class="bg-white py-16 sm:py-24">
+    <div class="container-edge grid items-center gap-12 lg:grid-cols-2">
+      <div class="relative">
+        <img
+          src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=80"
+          alt="ClearOut team loading furniture into a clean dump truck"
+          class="w-full rounded-2xl object-cover shadow-xl"
+          loading="lazy"
+        />
+        <div class="absolute -bottom-6 -right-2 hidden rounded-2xl bg-amber-core p-6 text-ink-950 shadow-xl sm:block">
+          <p class="font-display text-4xl font-black">10+</p>
+          <p class="text-sm font-bold uppercase tracking-wide">Years Serving<br />{business.address.city}</p>
+        </div>
+      </div>
+      <div>
+        <p class="eyebrow">Our Story</p>
+        <div class="accent-rule"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          From one truck to the metro's most-trusted haulers.
+        </h2>
+        <div class="mt-6 space-y-4 text-ink-600">
+          <p>
+            ClearOut started in {business.founded} with a single truck, a phone number, and a simple
+            promise: show up on time, charge a fair price, and never leave a mess behind. Word spread
+            fast across {business.address.city} — because honest hauling is harder to find than it
+            should be.
+          </p>
+          <p>
+            A decade later we run a fleet of clean dump trucks and a roster of background-checked,
+            uniformed crews. But the promise hasn't changed. We still quote upfront, we still sweep up
+            after, and we still personally route every reusable item to a local home instead of a
+            landfill.
+          </p>
+          <p>
+            When you call ClearOut, you're not getting a faceless franchise. You're getting neighbors
+            who care what happens to your junk after it leaves your driveway.
+          </p>
+        </div>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <button @click="$dispatch('open-booking')" class="btn-amber">Get a Free Quote</button>
+          <a href="/projects" class="btn-dark">See Our Work</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Metrics strip -->
+  <section class="bg-ink-950 py-14 texture-grid">
+    <div class="container-edge grid grid-cols-2 gap-8 lg:grid-cols-4">
+      {
+        metrics.map((m) => (
+          <div class="text-center">
+            <p class="font-display text-4xl font-black text-amber-core sm:text-5xl">{m.value}</p>
+            <p class="mt-2 text-sm font-semibold uppercase tracking-wide text-white/60">{m.label}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Eco mission -->
+  <section class="bg-bone py-16 sm:py-24">
+    <div class="container-edge grid items-center gap-12 lg:grid-cols-2">
+      <div class="order-2 lg:order-1">
+        <p class="eyebrow">Our Mission</p>
+        <div class="accent-rule"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          Keeping junk out of landfills — one load at a time.
+        </h2>
+        <p class="mt-6 text-ink-600">
+          Hauling is the easy part. Doing it responsibly is what sets us apart. Every load we pick up
+          gets sorted before it ever sees a dumpster. Our three-stream process means the majority of
+          what we collect finds a second life.
+        </p>
+        <div class="mt-8 space-y-5">
+          {
+            [
+              { icon: 'heart', t: 'Donate First', d: 'Furniture, working appliances and household goods go to local shelters, Habitat ReStores and family-support charities.' },
+              { icon: 'recycle', t: 'Recycle Second', d: 'Metal, e-waste, cardboard, concrete and yard waste are routed to certified recycling facilities — not the dump.' },
+              { icon: 'truck', t: 'Dispose Responsibly', d: 'Only what truly can\'t be reused goes to a licensed transfer station, sorted and compliant with WI DNR rules.' },
+            ].map((s) => (
+              <div class="flex gap-4">
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-amber-core">
+                  <Icon name={s.icon} class="h-6 w-6" />
+                </span>
+                <div>
+                  <h3 class="font-display text-lg font-bold text-ink-900">{s.t}</h3>
+                  <p class="mt-1 text-sm text-ink-600">{s.d}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <div class="order-1 lg:order-2">
+        <img
+          src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80"
+          alt="Sorted recycling materials ready for diversion from landfill"
+          class="w-full rounded-2xl object-cover shadow-xl"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Credentials / licensing -->
+  <section class="bg-white py-16 sm:py-24">
+    <div class="container-edge">
+      <div class="max-w-2xl">
+        <p class="eyebrow">Licensed. Insured. Accountable.</p>
+        <div class="accent-rule"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          The credentials behind every truck.
+        </h2>
+        <p class="mt-4 text-ink-600">
+          We carry the licensing and coverage that commercial property managers, realtors and
+          contractors require — and that homeowners deserve.
+        </p>
+      </div>
+      <div class="mt-12 grid gap-6 sm:grid-cols-2">
+        {
+          credentials.map((c) => (
+            <div class="card-lift flex gap-5 rounded-2xl border border-ink-900/10 bg-bone p-7">
+              <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-core text-ink-950">
+                <Icon name={c.icon} class="h-6 w-6" />
+              </span>
+              <div>
+                <h3 class="font-display text-lg font-bold text-ink-900">{c.t}</h3>
+                <p class="mt-1.5 text-sm leading-relaxed text-ink-600">{c.d}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Team grid -->
+  <section class="bg-bone-200 py-16 sm:py-24">
+    <div class="container-edge">
+      <div class="text-center">
+        <p class="eyebrow justify-center">Meet The Crew</p>
+        <div class="accent-rule mx-auto"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          The people who haul it all.
+        </h2>
+      </div>
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          team.map((t) => (
+            <figure class="card-lift overflow-hidden rounded-2xl bg-white shadow-sm">
+              <img src={t.img} alt={`${t.name}, ${t.role}`} class="aspect-[4/5] w-full object-cover" loading="lazy" />
+              <figcaption class="p-5">
+                <h3 class="font-display text-lg font-bold text-ink-900">{t.name}</h3>
+                <p class="text-sm font-semibold text-amber-deep">{t.role}</p>
+                <p class="mt-2 text-sm text-ink-600">{t.bio}</p>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>

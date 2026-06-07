@@ -1,0 +1,315 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { business, services } from '../data/site';
+
+const estimatorItems = services.map((s) => ({ title: s.title, icon: s.icon }));
+---
+
+<Layout
+  title="Contact & Free Quote"
+  description="Get a free junk removal quote in Madison, WI. Use our instant truckload estimator, call our dispatch line, or check our service area. Same-day & next-day pickups available."
+  path="/contact"
+>
+  <PageHero
+    eyebrow="Contact & Booking"
+    title="Get your free quote in under a minute."
+    subtitle="Use the instant estimator below, give us a call, or send a message — whatever's easiest. No pressure, no obligation."
+    image="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=2000&q=80"
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Contact' }]}
+  />
+
+  <!-- Contact methods strip -->
+  <section class="bg-white py-12">
+    <div class="container-edge grid gap-5 sm:grid-cols-3">
+      {
+        [
+          { icon: 'phone', label: 'Call Dispatch', value: business.phone, href: business.phoneHref, note: business.hours },
+          { icon: 'mail', label: 'Email Us', value: business.email, href: business.emailHref, note: 'Replies within 1 business hour' },
+          { icon: 'pin', label: 'Visit / Mail', value: `${business.address.city}, ${business.address.region}`, href: '#service-area', note: business.address.street },
+        ].map((c) => (
+          <a href={c.href} class="card-lift flex items-center gap-4 rounded-2xl border border-ink-900/10 bg-bone p-6">
+            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-amber-core">
+              <Icon name={c.icon} class="h-7 w-7" />
+            </span>
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wide text-ink-500">{c.label}</p>
+              <p class="font-display text-lg font-bold text-ink-900">{c.value}</p>
+              <p class="text-xs text-ink-500">{c.note}</p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Estimator + sidebar -->
+  <section class="bg-bone py-16 sm:py-20">
+    <div class="container-edge grid gap-10 lg:grid-cols-5">
+      <!-- Multi-step estimator -->
+      <div class="lg:col-span-3">
+        <div
+          class="overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-ink-900/5"
+          x-data={`{
+            step: 1,
+            maxStep: 4,
+            items: [],
+            load: 1,
+            access: 'driveway',
+            urgency: 'flexible',
+            form: { name: '', phone: '', email: '', zip: '' },
+            loadLabels: ['Minimum','1/4 Truck','1/2 Truck','3/4 Truck','Full Truck'],
+            priceRanges: ['$89–$129','$179–$249','$289–$369','$399–$489','$519–$649'],
+            accessFee: { driveway: 0, indoor: 0, stairs: 0, basement: 0 },
+            submitted: false,
+            toggle(i){ this.items.includes(i) ? this.items = this.items.filter(x=>x!==i) : this.items.push(i) },
+            next(){ if(this.step < this.maxStep) this.step++ },
+            back(){ if(this.step > 1) this.step-- },
+            submit(){ this.submitted = true },
+          }`}
+        >
+          <!-- Progress header -->
+          <div class="bg-ink-950 px-6 py-6 text-white sm:px-8">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="eyebrow text-amber-bright">Instant Estimator</p>
+                <h2 class="mt-1 font-display text-2xl font-extrabold">Build your quote</h2>
+              </div>
+              <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-amber-bright" x-show="!submitted">
+                Step <span x-text="step"></span> / <span x-text="maxStep"></span>
+              </span>
+            </div>
+            <div class="mt-5 h-1.5 overflow-hidden rounded-full bg-white/15" x-show="!submitted">
+              <div class="h-full bg-amber-core transition-all duration-500" :style="`width: ${(step / maxStep) * 100}%`"></div>
+            </div>
+          </div>
+
+          <div class="p-6 sm:p-8">
+            <!-- STEP 1 — items -->
+            <div x-show="step === 1 && !submitted">
+              <h3 class="font-display text-lg font-bold text-ink-900">1. What needs hauling?</h3>
+              <p class="mt-1 text-sm text-ink-600">Pick everything that applies.</p>
+              <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {
+                  estimatorItems.map((it) => (
+                    <button
+                      type="button"
+                      @click={`toggle('${it.title}')`}
+                      :class={`items.includes('${it.title}') ? 'border-amber-core bg-amber-50 ring-2 ring-amber-core/30' : 'border-ink-900/10 hover:border-amber-core/50'`}
+                      class="flex flex-col items-center gap-2 rounded-xl border-2 bg-white p-3 text-center transition"
+                    >
+                      <span class="text-amber-deep"><Icon name={it.icon} class="h-6 w-6" /></span>
+                      <span class="text-xs font-semibold text-ink-800">{it.title}</span>
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+
+            <!-- STEP 2 — load size -->
+            <div x-show="step === 2 && !submitted" x-cloak>
+              <h3 class="font-display text-lg font-bold text-ink-900">2. How much is there?</h3>
+              <p class="mt-1 text-sm text-ink-600">Slide to estimate your truckload.</p>
+              <div class="mt-6 rounded-2xl bg-bone p-5">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-semibold text-ink-700">Truckload size</span>
+                  <span class="rounded-full bg-ink-900 px-3 py-1 text-sm font-bold text-amber-bright" x-text="loadLabels[load]"></span>
+                </div>
+                <div class="mt-4 flex h-8 overflow-hidden rounded-md border border-ink-900/10 bg-white">
+                  <template x-for="n in 5" :key="n">
+                    <div class="flex-1 border-r border-ink-900/5 transition-all" :class="(n - 1) <= load ? 'bg-amber-core' : ''"></div>
+                  </template>
+                </div>
+                <input type="range" min="0" max="4" x-model.number="load" class="mt-4 h-2 w-full accent-amber-core" />
+                <p class="mt-4 text-center text-sm text-ink-600">
+                  Estimated range: <span class="font-bold text-amber-deep" x-text="priceRanges[load]"></span>
+                </p>
+              </div>
+            </div>
+
+            <!-- STEP 3 — access + urgency -->
+            <div x-show="step === 3 && !submitted" x-cloak class="space-y-6">
+              <div>
+                <h3 class="font-display text-lg font-bold text-ink-900">3. Where is it located?</h3>
+                <p class="mt-1 text-sm text-ink-600">Helps us bring the right crew & gear.</p>
+                <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {
+                    [
+                      { key: 'driveway', label: 'Curb / Driveway' },
+                      { key: 'indoor', label: 'Ground Floor' },
+                      { key: 'stairs', label: 'Up/Down Stairs' },
+                      { key: 'basement', label: 'Basement' },
+                    ].map((a) => (
+                      <button
+                        type="button"
+                        @click={`access = '${a.key}'`}
+                        :class={`access === '${a.key}' ? 'border-amber-core bg-amber-50 ring-2 ring-amber-core/30' : 'border-ink-900/10'`}
+                        class="rounded-xl border-2 bg-white p-3 text-xs font-semibold text-ink-800 transition"
+                      >
+                        {a.label}
+                      </button>
+                    ))
+                  }
+                </div>
+                <p class="mt-2 text-xs text-ink-500">No surcharge for stairs or basements — we just want to be ready.</p>
+              </div>
+              <div>
+                <h3 class="font-display text-lg font-bold text-ink-900">How soon?</h3>
+                <div class="mt-3 grid grid-cols-3 gap-3">
+                  {
+                    [
+                      { key: 'today', label: 'Today / ASAP' },
+                      { key: 'week', label: 'This Week' },
+                      { key: 'flexible', label: "I'm Flexible" },
+                    ].map((u) => (
+                      <button
+                        type="button"
+                        @click={`urgency = '${u.key}'`}
+                        :class={`urgency === '${u.key}' ? 'border-amber-core bg-amber-50 ring-2 ring-amber-core/30' : 'border-ink-900/10'`}
+                        class="rounded-xl border-2 bg-white p-3 text-xs font-semibold text-ink-800 transition"
+                      >
+                        {u.label}
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 4 — details -->
+            <div x-show="step === 4 && !submitted" x-cloak class="space-y-4">
+              <h3 class="font-display text-lg font-bold text-ink-900">4. Where do we send your quote?</h3>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <label class="block">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-ink-600">Name</span>
+                  <input x-model="form.name" type="text" placeholder="Jane Doe" class="mt-1.5 w-full rounded-lg border border-ink-900/15 px-3 py-2.5 text-sm focus:border-amber-core focus:outline-none focus:ring-2 focus:ring-amber-core/20" />
+                </label>
+                <label class="block">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-ink-600">Phone</span>
+                  <input x-model="form.phone" type="tel" placeholder="(608) 555-0123" class="mt-1.5 w-full rounded-lg border border-ink-900/15 px-3 py-2.5 text-sm focus:border-amber-core focus:outline-none focus:ring-2 focus:ring-amber-core/20" />
+                </label>
+                <label class="block">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-ink-600">Email</span>
+                  <input x-model="form.email" type="email" placeholder="jane@email.com" class="mt-1.5 w-full rounded-lg border border-ink-900/15 px-3 py-2.5 text-sm focus:border-amber-core focus:outline-none focus:ring-2 focus:ring-amber-core/20" />
+                </label>
+                <label class="block">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-ink-600">Pickup ZIP</span>
+                  <input x-model="form.zip" type="text" placeholder="53713" class="mt-1.5 w-full rounded-lg border border-ink-900/15 px-3 py-2.5 text-sm focus:border-amber-core focus:outline-none focus:ring-2 focus:ring-amber-core/20" />
+                </label>
+              </div>
+              <!-- Live summary -->
+              <div class="rounded-xl bg-bone p-4 text-sm">
+                <p class="font-bold text-ink-900">Your estimate</p>
+                <div class="mt-2 space-y-1 text-ink-600">
+                  <div class="flex justify-between"><span>Items</span><span class="font-semibold text-ink-900" x-text="items.length ? items.join(', ') : 'General junk'"></span></div>
+                  <div class="flex justify-between"><span>Load</span><span class="font-semibold text-ink-900" x-text="loadLabels[load]"></span></div>
+                  <div class="flex justify-between"><span>Estimated price</span><span class="font-bold text-amber-deep" x-text="priceRanges[load]"></span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBMITTED -->
+            <div x-show="submitted" x-cloak class="py-6 text-center">
+              <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-deep">
+                <Icon name="check-circle" class="h-9 w-9" stroke={1.8} />
+              </div>
+              <h3 class="mt-4 font-display text-2xl font-extrabold text-ink-900">Quote request sent!</h3>
+              <p class="mx-auto mt-2 max-w-sm text-sm text-ink-600">
+                Thanks <span class="font-semibold" x-text="form.name || 'there'"></span> — our dispatch
+                team will call <span class="font-semibold" x-text="form.phone || 'you'"></span> shortly to
+                lock in your <span class="font-semibold text-amber-deep" x-text="priceRanges[load]"></span> pickup.
+              </p>
+              <a href={business.phoneHref} class="btn-amber mt-6">Or call us now</a>
+            </div>
+
+            <!-- Controls -->
+            <div class="mt-7 flex items-center justify-between" x-show="!submitted">
+              <button @click="back()" x-show="step > 1" class="text-sm font-semibold text-ink-600 hover:text-ink-900">← Back</button>
+              <div x-show="step === 1"></div>
+              <button @click="next()" x-show="step < maxStep" class="btn-amber ml-auto px-6 py-2.5">Continue</button>
+              <button @click="submit()" x-show="step === maxStep" class="btn-amber ml-auto px-6 py-2.5">Get My Quote</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="space-y-6 lg:col-span-2">
+        <div class="rounded-2xl bg-ink-950 p-7 text-white texture-grid">
+          <h3 class="font-display text-xl font-bold">Prefer to talk?</h3>
+          <p class="mt-2 text-sm text-white/60">Our dispatch team answers fast and quotes on the spot.</p>
+          <a href={business.phoneHref} class="btn-amber mt-5 w-full">
+            <Icon name="phone" class="h-4 w-4" /> {business.phone}
+          </a>
+          <ul class="mt-6 space-y-3 text-sm">
+            <li class="flex items-center gap-3"><Icon name="clock" class="h-5 w-5 text-amber-core" />{business.hours}</li>
+            <li class="flex items-center gap-3"><Icon name="check-circle" class="h-5 w-5 text-amber-core" />Same-day & next-day pickups</li>
+            <li class="flex items-center gap-3"><Icon name="shield" class="h-5 w-5 text-amber-core" />Licensed & fully insured</li>
+          </ul>
+        </div>
+        <div class="rounded-2xl border border-ink-900/10 bg-white p-7">
+          <h3 class="font-display text-lg font-bold text-ink-900">Why a ClearOut quote?</h3>
+          <ul class="mt-4 space-y-3 text-sm text-ink-600">
+            <li class="flex gap-3"><span class="text-amber-deep"><Icon name="tag" class="h-5 w-5" /></span>All-in pricing — no curbside surprises.</li>
+            <li class="flex gap-3"><span class="text-amber-deep"><Icon name="recycle" class="h-5 w-5" /></span>We donate & recycle the majority of every load.</li>
+            <li class="flex gap-3"><span class="text-amber-deep"><Icon name="thumb" class="h-5 w-5" /></span>4.6★ from {business.rating.count}+ neighbors.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Service area map indicator -->
+  <section id="service-area" class="bg-white py-16 sm:py-20">
+    <div class="container-edge grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div>
+        <p class="eyebrow">Service Area</p>
+        <div class="accent-rule"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          Proudly serving the {business.address.regionName} metro.
+        </h2>
+        <p class="mt-4 text-ink-600">
+          Based in {business.address.city}, our crews cover the surrounding communities below. Not sure if
+          you're in range? Just ask — we travel for the right job.
+        </p>
+        <ul class="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {
+            business.serviceAreas.map((a) => (
+              <li class="flex items-center gap-2 text-sm font-medium text-ink-800">
+                <Icon name="pin" class="h-4 w-4 text-amber-deep" />{a}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <!-- Stylized map indicator (no external embed dependency) -->
+      <div class="relative overflow-hidden rounded-3xl border border-ink-900/10 bg-ink-950 p-2 shadow-xl">
+        <div class="texture-grid relative aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-ink-900 to-ink-950">
+          <!-- Concentric service radius -->
+          <div class="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-core/20"></div>
+          <div class="absolute left-1/2 top-1/2 h-52 w-52 -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-core/30"></div>
+          <div class="absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-core/40 bg-amber-core/5"></div>
+          <!-- Center pin -->
+          <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+            <span class="relative flex h-12 w-12 items-center justify-center">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-core/40"></span>
+              <span class="relative flex h-12 w-12 items-center justify-center rounded-full bg-amber-core text-ink-950">
+                <Icon name="pin" class="h-6 w-6" />
+              </span>
+            </span>
+            <p class="mt-2 font-display text-sm font-bold text-white">{business.address.city}, {business.address.region}</p>
+            <p class="text-xs text-white/50">{business.geo.lat}, {business.geo.lng}</p>
+          </div>
+          <!-- Scattered area dots -->
+          <span class="absolute left-[28%] top-[32%] h-2 w-2 rounded-full bg-amber-bright"></span>
+          <span class="absolute left-[70%] top-[40%] h-2 w-2 rounded-full bg-amber-bright"></span>
+          <span class="absolute left-[60%] top-[68%] h-2 w-2 rounded-full bg-amber-bright"></span>
+          <span class="absolute left-[35%] top-[64%] h-2 w-2 rounded-full bg-amber-bright"></span>
+          <span class="absolute left-[50%] top-[22%] h-2 w-2 rounded-full bg-amber-bright"></span>
+        </div>
+        <p class="px-3 py-3 text-center text-xs text-white/50">Approximate service radius — contact us to confirm coverage at your address.</p>
+      </div>
+    </div>
+  </section>
+</Layout>

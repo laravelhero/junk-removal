@@ -1,0 +1,198 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from './PageHero.astro';
+import Icon from './Icon.astro';
+import Faq from './Faq.astro';
+import { services } from '../data/site';
+import { serviceDetails } from '../data/serviceDetails';
+
+interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+const d = serviceDetails[slug];
+if (!d) throw new Error(`Unknown service slug: ${slug}`);
+
+const meta = services.find((s) => s.slug === slug)!;
+const related = services.filter((s) => s.slug !== slug).slice(0, 3);
+---
+
+<Layout
+  title={d.metaTitle}
+  description={d.metaDescription}
+  path={`/services/${slug}`}
+  image={d.heroImage}
+  serviceName={d.metaTitle}
+>
+  <PageHero
+    eyebrow={`${meta.category === 'commercial' ? 'Commercial' : 'Residential'} Service`}
+    title={d.h1}
+    subtitle={d.intro}
+    image={d.heroImage}
+    crumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Services', href: '/services' },
+      { label: d.metaTitle },
+    ]}
+  />
+
+  <!-- What we take -->
+  <section class="bg-white py-16 sm:py-20">
+    <div class="container-edge grid gap-12 lg:grid-cols-2">
+      <div>
+        <p class="eyebrow">What We Haul</p>
+        <div class="accent-rule"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          If it's on this list, consider it gone.
+        </h2>
+        <ul class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {
+            d.takes.map((item) => (
+              <li class="flex items-center gap-3 rounded-lg border border-ink-900/10 bg-bone px-4 py-3">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-core text-ink-950">
+                  <Icon name="check" class="h-4 w-4" stroke={3} />
+                </span>
+                <span class="text-sm font-medium text-ink-800">{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-6 text-sm text-ink-600">
+          Don't see your item? We probably take it anyway — just ask when you book.
+        </p>
+      </div>
+      <div class="space-y-6">
+        {
+          d.longCopy.map((block) => (
+            <div class="rounded-2xl border border-ink-900/10 bg-bone p-7">
+              <h3 class="font-display text-xl font-bold text-ink-900">{block.heading}</h3>
+              <p class="mt-3 leading-relaxed text-ink-600">{block.body}</p>
+            </div>
+          ))
+        }
+        <button @click="$dispatch('open-booking')" class="btn-amber w-full sm:w-auto">
+          Book This Service <Icon name="arrow-right" class="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weight & volume guidelines -->
+  <section class="bg-ink-950 py-16 text-white sm:py-20 texture-grid">
+    <div class="container-edge">
+      <div class="max-w-2xl">
+        <p class="eyebrow text-amber-bright">
+          <span class="h-px w-6 bg-amber-core"></span>Weight & Volume Guide
+        </p>
+        <h2 class="mt-4 font-display text-3xl font-extrabold sm:text-4xl">
+          Know roughly what you're hauling.
+        </h2>
+        <p class="mt-4 text-white/60">
+          Pricing follows truckload volume, but weight matters for dense materials. Here's a
+          ballpark so there are no surprises.
+        </p>
+      </div>
+      <div class="mt-10 overflow-hidden rounded-2xl border border-white/10">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-white/5 text-xs uppercase tracking-wider text-amber-bright">
+            <tr>
+              <th class="px-5 py-4 font-bold">Item</th>
+              <th class="px-5 py-4 font-bold">Est. Weight</th>
+              <th class="hidden px-5 py-4 font-bold sm:table-cell">Notes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/10">
+            {
+              d.weightGuide.map((w) => (
+                <tr class="transition hover:bg-white/5">
+                  <td class="px-5 py-4 font-semibold text-white">{w.item}</td>
+                  <td class="px-5 py-4 text-amber-core">{w.weight}</td>
+                  <td class="hidden px-5 py-4 text-white/60 sm:table-cell">{w.note}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing tiers -->
+  <section class="bg-bone py-16 sm:py-24">
+    <div class="container-edge">
+      <div class="text-center">
+        <p class="eyebrow justify-center">Transparent Pricing</p>
+        <div class="accent-rule mx-auto"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          Upfront tiers. No surprise fees.
+        </h2>
+        <p class="mx-auto mt-4 max-w-xl text-ink-600">
+          Final price depends on volume and access — but you'll always get an exact, all-in quote
+          before we lift a thing.
+        </p>
+      </div>
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          d.pricing.map((tier) => (
+            <div
+              class:list={[
+                'card-lift relative flex flex-col rounded-2xl border bg-white p-7',
+                tier.popular ? 'border-amber-core ring-2 ring-amber-core/30' : 'border-ink-900/10',
+              ]}
+            >
+              {tier.popular && (
+                <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-core px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-950">
+                  Most Popular
+                </span>
+              )}
+              <h3 class="font-display text-lg font-bold text-ink-900">{tier.name}</h3>
+              <p class="text-xs font-semibold uppercase tracking-wide text-ink-500">{tier.size}</p>
+              <p class="mt-4 font-display text-3xl font-black text-amber-deep">{tier.price}</p>
+              <p class="mt-3 flex-1 text-sm text-ink-600">{tier.blurb}</p>
+              <button @click="$dispatch('open-booking')" class:list={['mt-6 w-full', tier.popular ? 'btn-amber' : 'btn-dark']}>
+                Get Quote
+              </button>
+            </div>
+          ))
+        }
+      </div>
+      <p class="mt-6 text-center text-xs text-ink-500">
+        Prices are estimates for the Madison metro and vary by exact volume, weight and site access. Your quote is always confirmed upfront.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <Faq items={d.faqs} heading={`${d.metaTitle} — Your Questions`} />
+
+  <!-- Related services -->
+  <section class="bg-white py-16 sm:py-20">
+    <div class="container-edge">
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <p class="eyebrow">Keep Clearing</p>
+          <div class="accent-rule"></div>
+          <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900">Related services</h2>
+        </div>
+        <a href="/services" class="hidden text-sm font-bold uppercase tracking-wide text-amber-deep hover:text-amber-core sm:block">
+          View all →
+        </a>
+      </div>
+      <div class="mt-8 grid gap-6 sm:grid-cols-3">
+        {
+          related.map((s) => (
+            <a href={`/services/${s.slug}`} class="card-lift group flex items-center gap-4 rounded-2xl border border-ink-900/10 bg-bone p-6">
+              <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-amber-core transition group-hover:bg-amber-core group-hover:text-ink-950">
+                <Icon name={s.icon} class="h-7 w-7" />
+              </span>
+              <div>
+                <h3 class="font-display text-base font-bold text-ink-900">{s.title}</h3>
+                <p class="mt-0.5 text-sm text-ink-600">{s.short}</p>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,113 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import { services, howItWorks } from '../../data/site';
+
+// Serialize the minimal data Alpine needs for client-side filtering.
+const cards = services.map((s) => ({
+  slug: s.slug,
+  title: s.title,
+  short: s.short,
+  category: s.category,
+  icon: s.icon,
+  hero: s.hero,
+}));
+---
+
+<Layout
+  title="Junk Removal Services — Residential & Commercial"
+  description="Full-service junk removal in Madison, WI: furniture & appliance removal, garage & estate cleanouts, construction debris and yard waste hauling. Filter by residential or commercial."
+  path="/services"
+  serviceName="Junk Removal & Hauling"
+>
+  <PageHero
+    eyebrow="Our Services"
+    title="Whatever it is, we haul it all."
+    subtitle="From a single couch to a full commercial build-out, our crews clear it fast — and divert most of it from the landfill."
+    image="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=2000&q=80"
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Services' }]}
+  />
+
+  <section class="bg-bone py-16 sm:py-20" x-data={`{ filter: 'all', cards: ${JSON.stringify(cards)} }`}>
+    <div class="container-edge">
+      <!-- Filter tabs -->
+      <div class="flex flex-col items-center gap-6">
+        <div class="text-center">
+          <p class="eyebrow justify-center">Browse By Category</p>
+          <div class="accent-rule mx-auto"></div>
+        </div>
+        <div class="inline-flex flex-wrap justify-center gap-2 rounded-full bg-white p-1.5 shadow-sm ring-1 ring-ink-900/5">
+          {
+            [
+              { key: 'all', label: 'All Services' },
+              { key: 'residential', label: 'Residential' },
+              { key: 'commercial', label: 'Commercial' },
+            ].map((tab) => (
+              <button
+                @click={`filter = '${tab.key}'`}
+                :class={`filter === '${tab.key}' ? 'bg-ink-950 text-white' : 'text-ink-700 hover:bg-bone'`}
+                class="rounded-full px-6 py-2.5 text-sm font-bold uppercase tracking-wide transition"
+              >
+                {tab.label}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <template x-for="c in cards.filter(c => filter === 'all' || c.category === filter)" :key="c.slug">
+          <a
+            :href="`/services/${c.slug}`"
+            x-transition.opacity
+            class="card-lift group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink-900/5"
+          >
+            <div class="relative h-44 overflow-hidden">
+              <img :src="c.hero" :alt="c.title" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
+              <div class="absolute inset-0 bg-gradient-to-t from-ink-950/70 to-transparent"></div>
+              <span class="absolute left-4 top-4 rounded-full bg-amber-core px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-950" x-text="c.category"></span>
+            </div>
+            <div class="flex flex-1 flex-col p-6">
+              <h3 class="font-display text-xl font-bold text-ink-900" x-text="c.title"></h3>
+              <p class="mt-2 flex-1 text-sm text-ink-600" x-text="c.short"></p>
+              <span class="mt-4 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-amber-deep">
+                Learn More
+                <svg class="h-4 w-4 transition group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              </span>
+            </div>
+          </a>
+        </template>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works recap -->
+  <section class="bg-white py-16 sm:py-20">
+    <div class="container-edge">
+      <div class="text-center">
+        <p class="eyebrow justify-center">Simple Every Time</p>
+        <div class="accent-rule mx-auto"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">How every job runs.</h2>
+      </div>
+      <div class="mt-12 grid gap-6 md:grid-cols-3">
+        {
+          howItWorks.map((s) => (
+            <div class="relative rounded-2xl border border-ink-900/10 bg-bone p-8 text-center">
+              <span class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-core text-ink-950">
+                <Icon name={s.icon} class="h-8 w-8" />
+              </span>
+              <p class="mt-4 font-display text-5xl font-black text-ink-900/10">{s.step}</p>
+              <h3 class="-mt-6 font-display text-xl font-bold text-ink-900">{s.title}</h3>
+              <p class="mt-2 text-sm text-ink-600">{s.detail}</p>
+            </div>
+          ))
+        }
+      </div>
+      <div class="mt-12 text-center">
+        <button @click="$dispatch('open-booking')" class="btn-amber">Book Your Free Quote</button>
+      </div>
+    </div>
+  </section>
+</Layout>

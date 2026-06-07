@@ -1,0 +1,563 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { business, services, trustPoints, howItWorks } from '../data/site';
+import { posts, formatDate } from '../data/posts';
+
+// Latest three articles for the home-page blog teaser.
+const latestPosts = [...posts]
+  .sort((a, b) => (a.date < b.date ? 1 : -1))
+  .slice(0, 3);
+
+// Featured case studies for the home-page projects teaser.
+const featuredProjects = [
+  {
+    title: 'Full Hoarder House Cleanout',
+    location: 'Madison, WI',
+    image: 'https://images.unsplash.com/photo-1558211583-d26f610c1eb1?auto=format&fit=crop&w=1200&q=80',
+    tag: 'Estate Cleanout',
+    stats: [
+      { label: 'Truckloads', value: '9' },
+      { label: 'Diverted', value: '75%' },
+      { label: 'Timeline', value: '3 days' },
+    ],
+  },
+  {
+    title: '3-Ton Office Debris Haul',
+    location: 'Fitchburg, WI',
+    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80',
+    tag: 'Commercial',
+    stats: [
+      { label: 'Weight', value: '3.1 tons' },
+      { label: 'Recycled', value: '62%' },
+      { label: 'Downtime', value: '0 hrs' },
+    ],
+  },
+  {
+    title: 'Estate Downsizing & Move-Out',
+    location: 'Middleton, WI',
+    image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80',
+    tag: 'Downsizing',
+    stats: [
+      { label: 'Truckloads', value: '5' },
+      { label: 'Donated', value: '58%' },
+      { label: 'Timeline', value: '1 day' },
+    ],
+  },
+];
+
+const reviews = [
+  {
+    name: 'Marcus T.',
+    area: 'Middleton, WI',
+    text: 'Booked online at 8am, junk was gone by noon. The crew was respectful, fast, and the price matched the quote exactly. No surprise fees.',
+  },
+  {
+    name: 'Priya N.',
+    area: 'Sun Prairie, WI',
+    text: 'They cleared out my late father\'s garage with so much care. Donated what they could and sent me photos of where it went. Truly above and beyond.',
+  },
+  {
+    name: 'Dave & Carol R.',
+    area: 'Fitchburg, WI',
+    text: 'Full basement reno debris hauled in one trip. On time, uniformed, and they swept up after. Already booked them for the next phase.',
+  },
+];
+---
+
+<Layout
+  title="Junk Removal & Hauling Done Right"
+  description="ClearOut Junk Removal hauls furniture, appliances, construction debris & more across Madison, WI. Fast service, upfront pricing, eco-friendly disposal. Book your free quote today."
+  path="/"
+>
+  <!-- ========================= HERO ========================= -->
+  <section class="relative overflow-hidden bg-ink-950 text-white">
+    <img
+      src="https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=2000&q=80"
+      alt="ClearOut junk removal crew standing in front of a loaded dump truck"
+      class="absolute inset-0 h-full w-full object-cover opacity-30"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/95 to-ink-950/40"></div>
+    <div class="texture-grid absolute inset-0 opacity-50"></div>
+
+    <div class="container-edge relative grid items-center gap-12 py-20 lg:grid-cols-12 lg:py-28">
+      <div class="lg:col-span-7">
+        <p class="eyebrow text-amber-bright">
+          <span class="h-px w-8 bg-amber-core"></span>
+          {business.address.city} & Greater {business.address.regionName}
+        </p>
+        <h1 class="mt-5 font-display text-5xl font-black uppercase leading-[0.92] tracking-tight sm:text-7xl xl:text-8xl">
+          We Remove<br /><span class="text-amber-core">Your Junk.</span>
+        </h1>
+        <p class="mt-6 max-w-xl text-xl font-medium text-white/80 sm:text-2xl">
+          You relax. We do the heavy lifting.
+        </p>
+
+        <!-- Trust checkpoints -->
+        <ul class="mt-8 flex flex-wrap gap-x-8 gap-y-3">
+          {
+            trustPoints.map((tp) => (
+              <li class="flex items-center gap-2.5">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-amber-core text-ink-950">
+                  <Icon name="check" class="h-4 w-4" stroke={3} />
+                </span>
+                <span class="text-sm font-bold uppercase tracking-wide text-white">{tp.label}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <button @click="$dispatch('open-booking')" class="btn-amber px-8 py-4 text-base">
+            Book Your Free Quote <Icon name="arrow-right" class="h-5 w-5" />
+          </button>
+          <a href={business.phoneHref} class="flex items-center gap-3 text-white">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/5 text-amber-core">
+              <Icon name="phone" class="h-5 w-5" />
+            </span>
+            <span>
+              <span class="block text-xs uppercase tracking-wider text-white/50">Call us today</span>
+              <span class="block font-display text-lg font-bold">{business.phone}</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Floating rating card -->
+      <div class="lg:col-span-5">
+        <div class="ml-auto max-w-sm rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
+          <div class="flex items-center gap-4">
+            <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-white text-2xl font-black text-ink-900">G</div>
+            <div>
+              <div class="flex items-center gap-1 text-amber-core">
+                {[1, 2, 3, 4].map(() => <Icon name="star" class="h-5 w-5" fill="currentColor" stroke={0} />)}
+                <Icon name="star" class="h-5 w-5" />
+              </div>
+              <p class="mt-1 text-sm text-white/70">
+                <span class="font-bold text-white">{business.rating.value}</span> · Based on {business.rating.count}+ Google Reviews
+              </p>
+            </div>
+          </div>
+          <hr class="my-5 border-white/10" />
+          <div class="grid grid-cols-3 gap-3 text-center">
+            <div>
+              <p class="font-display text-2xl font-extrabold text-amber-core">12k+</p>
+              <p class="text-[11px] uppercase tracking-wide text-white/50">Jobs Hauled</p>
+            </div>
+            <div>
+              <p class="font-display text-2xl font-extrabold text-amber-core">68%</p>
+              <p class="text-[11px] uppercase tracking-wide text-white/50">Diverted</p>
+            </div>
+            <div>
+              <p class="font-display text-2xl font-extrabold text-amber-core">Same-Day</p>
+              <p class="text-[11px] uppercase tracking-wide text-white/50">Pickups</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SERVICE ICON RIBBON ===================== -->
+  <section class="bg-bone py-14 sm:py-16">
+    <div class="container-edge">
+      <div class="grid grid-cols-2 divide-ink-900/10 sm:grid-cols-3 lg:grid-cols-6 lg:divide-x">
+        {
+          services.map((s) => (
+            <a
+              href={`/services/${s.slug}`}
+              data-reveal
+              class="group flex flex-col items-center gap-3 px-3 py-6 text-center transition hover:bg-white"
+            >
+              <span class="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-amber-deep shadow-sm ring-1 ring-ink-900/5 transition group-hover:bg-amber-core group-hover:text-ink-950">
+                <Icon name={s.icon} class="h-8 w-8" />
+              </span>
+              <span class="font-display text-sm font-bold uppercase tracking-wide text-ink-900">{s.title}</span>
+              <span class="text-xs leading-snug text-ink-600">{s.blurb}</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT TEASER ===================== -->
+  <section class="bg-white py-16 sm:py-24">
+    <div class="container-edge grid items-center gap-12 lg:grid-cols-2">
+      <!-- Image collage -->
+      <div data-reveal class="relative">
+        <img
+          src="https://images.unsplash.com/photo-1600518464441-9154a4dea21b?auto=format&fit=crop&w=1200&q=80"
+          alt="ClearOut mover carrying a box to the hauling truck"
+          class="aspect-[4/3] w-full rounded-3xl object-cover shadow-xl"
+          loading="lazy"
+        />
+        <img
+          src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80"
+          alt="Sorted recycling bins — diverting junk from the landfill"
+          class="absolute -bottom-8 -right-4 hidden w-44 rounded-2xl border-4 border-white object-cover shadow-2xl sm:block"
+          loading="lazy"
+        />
+        <div class="absolute -left-4 -top-4 rounded-2xl bg-amber-core px-5 py-4 text-ink-950 shadow-xl">
+          <p class="font-display text-3xl font-black leading-none">10+</p>
+          <p class="text-xs font-bold uppercase tracking-wide">Years Local</p>
+        </div>
+      </div>
+
+      <!-- Copy -->
+      <div data-reveal>
+        <p class="eyebrow">About ClearOut</p>
+        <div class="accent-rule"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          Neighbors who care what happens to your junk.
+        </h2>
+        <p class="mt-5 text-ink-600">
+          We started in {business.founded} with one truck and a simple promise: show up on time,
+          charge a fair price, and never leave a mess behind. A decade later we run a fleet of clean
+          dump trucks and background-checked crews across the {business.address.regionName} metro —
+          but the promise hasn't changed.
+        </p>
+        <ul class="mt-7 space-y-4">
+          {
+            [
+              { icon: 'shield', t: 'Licensed, bonded & $2M insured', d: 'The coverage realtors and property managers require — and homeowners deserve.' },
+              { icon: 'recycle', t: '68% diverted from the landfill', d: 'We donate and recycle the majority of every single load we haul.' },
+              { icon: 'heart', t: 'Respectful in every home', d: 'Uniformed, on-time crews who treat your space like their own.' },
+            ].map((row) => (
+              <li class="flex gap-4">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-amber-core">
+                  <Icon name={row.icon} class="h-6 w-6" />
+                </span>
+                <div>
+                  <h3 class="font-display text-base font-bold text-ink-900">{row.t}</h3>
+                  <p class="mt-0.5 text-sm text-ink-600">{row.d}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/about" class="btn-dark">
+            More About Us <Icon name="arrow-right" class="h-4 w-4" />
+          </a>
+          <a href="/projects" class="inline-flex items-center gap-2 px-3 py-3.5 text-sm font-bold uppercase tracking-wide text-amber-deep transition hover:text-amber-core">
+            See Our Work
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SERVICES SHOWCASE ===================== -->
+  <section class="texture-grid bg-ink-950 py-16 text-white sm:py-24">
+    <div class="container-edge">
+      <div class="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div>
+          <p class="eyebrow text-amber-bright">
+            <span class="h-px w-8 bg-amber-core"></span>What We Haul
+          </p>
+          <h2 class="mt-4 max-w-xl font-display text-3xl font-extrabold sm:text-4xl">
+            Full-service hauling for home & jobsite.
+          </h2>
+        </div>
+        <p class="max-w-sm text-white/60">
+          From a single couch to a full commercial build-out — pick a service to see pricing,
+          weight guides and FAQs.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          services.map((s) => (
+            <a
+              href={`/services/${s.slug}`}
+              data-reveal
+              class="group relative flex flex-col overflow-hidden rounded-2xl bg-ink-900 ring-1 ring-white/10 transition duration-300 hover:-translate-y-1.5 hover:ring-amber-core/50"
+            >
+              <div class="relative h-44 overflow-hidden">
+                <img
+                  src={s.hero}
+                  alt={s.title}
+                  class="h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105 group-hover:opacity-100"
+                  loading="lazy"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-ink-900 via-ink-900/40 to-transparent" />
+                <span class="absolute left-4 top-4 rounded-full bg-amber-core/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-950">
+                  {s.category}
+                </span>
+                <span class="absolute -bottom-6 left-5 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-core text-ink-950 shadow-lg">
+                  <Icon name={s.icon} class="h-6 w-6" />
+                </span>
+              </div>
+              <div class="flex flex-1 flex-col p-6 pt-8">
+                <h3 class="font-display text-lg font-bold text-white">{s.title}</h3>
+                <p class="mt-2 flex-1 text-sm text-white/60">{s.blurb}</p>
+                <span class="mt-4 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-amber-bright">
+                  Learn More
+                  <Icon name="arrow-right" class="h-4 w-4 transition group-hover:translate-x-1" />
+                </span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      <div class="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 sm:flex-row sm:p-8">
+        <p class="text-center font-display text-xl font-bold sm:text-left">
+          Not sure which service you need? <span class="text-amber-core">We'll sort it out on the call.</span>
+        </p>
+        <div class="flex shrink-0 gap-3">
+          <a href="/services" class="btn-ghost">All Services</a>
+          <button @click="$dispatch('open-booking')" class="btn-amber">Free Quote</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PROJECTS ===================== -->
+  <section class="bg-white py-16 sm:py-24">
+    <div class="container-edge">
+      <div class="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div>
+          <p class="eyebrow">Our Work</p>
+          <div class="accent-rule"></div>
+          <h2 class="mt-4 max-w-xl font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+            Real jobs, real diversion metrics.
+          </h2>
+        </div>
+        <a href="/projects" class="btn-dark">
+          View All Projects <Icon name="arrow-right" class="h-4 w-4" />
+        </a>
+      </div>
+
+      <div class="mt-12 grid gap-6 md:grid-cols-3">
+        {
+          featuredProjects.map((p) => (
+            <a
+              href="/projects"
+              data-reveal
+              class="card-lift group flex flex-col overflow-hidden rounded-2xl bg-bone shadow-sm ring-1 ring-ink-900/5"
+            >
+              <div class="relative h-52 overflow-hidden">
+                <img
+                  src={p.image}
+                  alt={p.title}
+                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-ink-950/50 to-transparent" />
+                <span class="absolute left-4 top-4 rounded-full bg-amber-core px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-950">
+                  {p.tag}
+                </span>
+              </div>
+              <div class="flex flex-1 flex-col p-6">
+                <h3 class="font-display text-lg font-bold text-ink-900">{p.title}</h3>
+                <p class="mt-1 text-sm font-semibold uppercase tracking-wide text-amber-deep">{p.location}</p>
+                <div class="mt-5 grid grid-cols-3 gap-3 border-t border-ink-900/10 pt-5">
+                  {p.stats.map((s) => (
+                    <div>
+                      <p class="font-display text-xl font-extrabold text-ink-900">{s.value}</p>
+                      <p class="text-[10px] font-semibold uppercase tracking-wide text-ink-500">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SPLIT CALLOUT ===================== -->
+  <section class="grid lg:grid-cols-2">
+    <!-- LEFT — How it works -->
+    <div class="bg-white px-6 py-16 sm:px-10 lg:py-24">
+      <div class="mx-auto max-w-lg lg:ml-auto lg:mr-0">
+        <p class="eyebrow">How It Works</p>
+        <div class="accent-rule"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          Three steps to a clutter-free space.
+        </h2>
+        <div class="mt-10 space-y-8">
+          {
+            howItWorks.map((s) => (
+              <div class="flex items-start gap-5">
+                <div class="relative shrink-0">
+                  <span class="flex h-14 w-14 items-center justify-center rounded-full bg-amber-core text-ink-950">
+                    <Icon name={s.icon} class="h-7 w-7" />
+                  </span>
+                  <span class="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-ink-900 text-xs font-bold text-white">
+                    {s.step}
+                  </span>
+                </div>
+                <div>
+                  <h3 class="font-display text-xl font-bold text-ink-900">{s.title}</h3>
+                  <p class="mt-1 text-ink-600">{s.detail}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+        <button @click="$dispatch('open-booking')" class="btn-dark mt-10">
+          Get Started <Icon name="arrow-right" class="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT — Dark values block -->
+    <div class="texture-grid relative bg-ink-950 px-6 py-16 text-white sm:px-10 lg:py-24">
+      <div class="mx-auto max-w-lg lg:mr-auto lg:ml-0">
+        <h2 class="font-display text-4xl font-black uppercase leading-tight sm:text-5xl">
+          Local. Reliable. <span class="text-amber-core">Respectful.</span>
+        </h2>
+        <p class="mt-4 max-w-md text-lg text-white/70">
+          Proudly serving our community with honest service and a commitment to doing it right —
+          every load, every time.
+        </p>
+
+        <div class="mt-10 grid gap-5 sm:grid-cols-2">
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-core/15 text-amber-core">
+              <Icon name="heart" class="h-6 w-6" />
+            </span>
+            <h3 class="mt-4 font-display text-lg font-bold">We Donate</h3>
+            <p class="mt-1 text-sm text-white/60">Usable items go to local charities & shelters.</p>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-core/15 text-amber-core">
+              <Icon name="recycle" class="h-6 w-6" />
+            </span>
+            <h3 class="mt-4 font-display text-lg font-bold">We Recycle</h3>
+            <p class="mt-1 text-sm text-white/60">We recycle & dispose responsibly, not lazily.</p>
+          </div>
+        </div>
+
+        <!-- Google aggregate -->
+        <div class="mt-6 flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-5">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white text-xl font-black text-ink-900">G</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-1 text-amber-core">
+              {[1, 2, 3, 4].map(() => <Icon name="star" class="h-4 w-4" fill="currentColor" stroke={0} />)}
+              <Icon name="star" class="h-4 w-4" />
+            </div>
+            <p class="text-sm text-white/60">
+              <span class="font-bold text-white">{business.rating.value}</span> from {business.rating.count}+ reviews
+            </p>
+          </div>
+          <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-core/15 text-amber-core">
+            <Icon name="shield" class="h-6 w-6" />
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== WHY CHOOSE / VALUE STRIP ===================== -->
+  <section class="bg-white py-16 sm:py-20">
+    <div class="container-edge">
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          [
+            { icon: 'tag', t: 'Upfront, All-In Pricing', d: 'The number we quote is the number you pay. Labor, loading & disposal included.' },
+            { icon: 'clock', t: 'Same-Day Availability', d: 'Book in minutes. Most appointments filled within 24 hours, often same-day.' },
+            { icon: 'shield', t: 'Licensed & Fully Insured', d: 'Background-checked, uniformed crews and full liability coverage on every job.' },
+            { icon: 'recycle', t: 'Eco-First Disposal', d: 'We sort, donate and recycle to divert the majority of every load from landfill.' },
+          ].map((c) => (
+            <div data-reveal class="card-lift rounded-2xl border border-ink-900/10 bg-bone p-7">
+              <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-ink-900 text-amber-core">
+                <Icon name={c.icon} class="h-6 w-6" />
+              </span>
+              <h3 class="mt-5 font-display text-lg font-bold text-ink-900">{c.t}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-ink-600">{c.d}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== REVIEWS ===================== -->
+  <section class="bg-bone-200 py-16 sm:py-20">
+    <div class="container-edge">
+      <div class="text-center">
+        <p class="eyebrow justify-center">What Neighbors Say</p>
+        <div class="accent-rule mx-auto"></div>
+        <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          Trusted across the {business.address.regionName} metro.
+        </h2>
+      </div>
+      <div class="mt-12 grid gap-6 lg:grid-cols-3">
+        {
+          reviews.map((r) => (
+            <figure data-reveal class="card-lift flex flex-col rounded-2xl bg-white p-7 shadow-sm">
+              <div class="flex items-center gap-1 text-amber-core">
+                {[1, 2, 3, 4, 5].map(() => <Icon name="star" class="h-5 w-5" fill="currentColor" stroke={0} />)}
+              </div>
+              <blockquote class="mt-4 flex-1 text-ink-700">“{r.text}”</blockquote>
+              <figcaption class="mt-5 border-t border-ink-900/10 pt-4">
+                <p class="font-display font-bold text-ink-900">{r.name}</p>
+                <p class="text-sm text-ink-500">{r.area}</p>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BLOG / RESOURCES ===================== -->
+  <section class="bg-white py-16 sm:py-24">
+    <div class="container-edge">
+      <div class="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div>
+          <p class="eyebrow">Tips & Resources</p>
+          <div class="accent-rule"></div>
+          <h2 class="mt-4 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+            From the ClearOut journal.
+          </h2>
+        </div>
+        <a href="/blog" class="btn-dark">
+          Read The Blog <Icon name="arrow-right" class="h-4 w-4" />
+        </a>
+      </div>
+
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          latestPosts.map((p) => (
+            <a
+              href={`/blog/${p.slug}`}
+              data-reveal
+              class="card-lift group flex flex-col overflow-hidden rounded-2xl bg-bone shadow-sm ring-1 ring-ink-900/5"
+            >
+              <div class="relative h-48 overflow-hidden">
+                <img
+                  src={p.cover}
+                  alt={p.title}
+                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <span class="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-900">
+                  {p.category}
+                </span>
+              </div>
+              <div class="flex flex-1 flex-col p-6">
+                <h3 class="font-display text-lg font-bold leading-snug text-ink-900">{p.title}</h3>
+                <p class="mt-2 line-clamp-3 flex-1 text-sm text-ink-600">{p.excerpt}</p>
+                <div class="mt-4 flex items-center justify-between border-t border-ink-900/5 pt-4 text-xs text-ink-500">
+                  <span>{formatDate(p.date)}</span>
+                  <span class="inline-flex items-center gap-1 font-bold uppercase tracking-wide text-amber-deep">
+                    Read <Icon name="arrow-right" class="h-3.5 w-3.5" />
+                  </span>
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+</Layout>

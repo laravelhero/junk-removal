@@ -1,0 +1,174 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+
+const projects = [
+  {
+    title: 'Full Hoarder House Cleanout',
+    location: 'Madison, WI · Single-Family Home',
+    image: 'https://images.unsplash.com/photo-1558211583-d26f610c1eb1?auto=format&fit=crop&w=1200&q=80',
+    summary:
+      'A compassionate, three-day clear-out of a packed two-story home. We worked alongside the family, set aside keepsakes and documents, and restored every room to a safe, walkable, market-ready state.',
+    stats: [
+      { label: 'Truckloads', value: '9' },
+      { label: 'Donated', value: '40%' },
+      { label: 'Recycled', value: '35%' },
+      { label: 'Timeline', value: '3 days' },
+    ],
+    tags: ['Estate Cleanout', 'Sensitive', 'Donation Routed'],
+  },
+  {
+    title: '3-Ton Office Debris Haul',
+    location: 'Fitchburg, WI · Commercial Build-Out',
+    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80',
+    summary:
+      'A 12,000 sq ft office gut for a remodeling GC. Daily on-call hauls kept the demolition crew moving while we separated metal, ceiling grid, carpet and drywall for maximum diversion.',
+    stats: [
+      { label: 'Weight', value: '3.1 tons' },
+      { label: 'Recycled', value: '62%' },
+      { label: 'Hauls', value: '6' },
+      { label: 'Downtime', value: '0 hrs' },
+    ],
+    tags: ['Construction Debris', 'Commercial', 'Recurring'],
+  },
+  {
+    title: 'Estate Downsizing & Move-Out',
+    location: 'Middleton, WI · 4-Bedroom Home',
+    image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80',
+    summary:
+      'Helped a family downsize a parent\'s longtime home ahead of an assisted-living move. Furniture and housewares were donated locally with receipts provided; the home was left broom-clean for listing.',
+    stats: [
+      { label: 'Truckloads', value: '5' },
+      { label: 'Donated', value: '58%' },
+      { label: 'Recycled', value: '22%' },
+      { label: 'Timeline', value: '1 day' },
+    ],
+    tags: ['Estate', 'Downsizing', 'Realtor Coordinated'],
+  },
+  {
+    title: 'Two-Car Garage Restoration',
+    location: 'Sun Prairie, WI · Residential Garage',
+    image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1200&q=80',
+    summary:
+      'A decade of accumulated boxes, broken equipment and old tires cleared in a single afternoon. The homeowner parked both cars inside that night for the first time in years.',
+    stats: [
+      { label: 'Truckloads', value: '1.5' },
+      { label: 'Recycled', value: '48%' },
+      { label: 'Donated', value: '18%' },
+      { label: 'Timeline', value: '3 hrs' },
+    ],
+    tags: ['Garage Cleanout', 'Residential', 'Same-Day'],
+  },
+  {
+    title: 'Storm Debris Rapid Response',
+    location: 'Verona, WI · Half-Acre Property',
+    image: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=1200&q=80',
+    summary:
+      'After a derecho took down mature trees, we dispatched a crew same-day to clear fallen limbs and brush from the driveway and yard. All organic debris was mulched at a regional facility.',
+    stats: [
+      { label: 'Truckloads', value: '4' },
+      { label: 'Mulched', value: '100%' },
+      { label: 'Response', value: 'Same-day' },
+      { label: 'Crew', value: '3' },
+    ],
+    tags: ['Yard Waste', 'Storm Response', 'Composted'],
+  },
+  {
+    title: 'Retail Renovation Clear-Out',
+    location: 'Monona, WI · Storefront',
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
+    summary:
+      'Removed dated fixtures, shelving, signage and flooring from a 4,000 sq ft retail space overnight, letting the new tenant\'s build-out begin first thing the next morning.',
+    stats: [
+      { label: 'Truckloads', value: '3' },
+      { label: 'Recycled', value: '55%' },
+      { label: 'Window', value: 'Overnight' },
+      { label: 'Fixtures', value: 'Donated' },
+    ],
+    tags: ['Commercial', 'Fixtures', 'After-Hours'],
+  },
+];
+
+const totals = [
+  { value: '12,400+', label: 'Jobs Completed' },
+  { value: '68%', label: 'Average Diversion' },
+  { value: '3.2M lbs', label: 'Kept From Landfill' },
+  { value: '4.6★', label: 'Customer Rating' },
+];
+---
+
+<Layout
+  title="Projects & Case Studies"
+  description="Real ClearOut Junk Removal case studies across Madison, WI — hoarder cleanouts, commercial debris hauls, estate downsizing and storm response, with diversion and recycling metrics."
+  path="/projects"
+>
+  <PageHero
+    eyebrow="Our Work"
+    title="Real jobs. Real metrics. Real diversion."
+    subtitle="From single-afternoon garage resets to multi-day estate cleanouts — here's what we've hauled, and how much of it we kept out of the landfill."
+    image="https://images.unsplash.com/photo-1600518464441-9154a4dea21b?auto=format&fit=crop&w=2000&q=80"
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Projects' }]}
+  />
+
+  <!-- Totals -->
+  <section class="bg-ink-950 py-12 texture-grid">
+    <div class="container-edge grid grid-cols-2 gap-8 lg:grid-cols-4">
+      {
+        totals.map((t) => (
+          <div class="text-center">
+            <p class="font-display text-3xl font-black text-amber-core sm:text-4xl">{t.value}</p>
+            <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-white/60">{t.label}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Case studies -->
+  <section class="bg-bone py-16 sm:py-24">
+    <div class="container-edge space-y-10">
+      {
+        projects.map((p, i) => (
+          <article class="card-lift grid overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-ink-900/5 lg:grid-cols-2">
+            <div class:list={['relative min-h-64 overflow-hidden', i % 2 === 1 && 'lg:order-2']}>
+              <img src={p.image} alt={p.title} class="h-full w-full object-cover" loading="lazy" />
+              <div class="absolute inset-0 bg-gradient-to-t from-ink-950/40 to-transparent"></div>
+            </div>
+            <div class="flex flex-col p-8 sm:p-10">
+              <div class="flex flex-wrap gap-2">
+                {p.tags.map((tag) => (
+                  <span class="rounded-full bg-bone px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-700">{tag}</span>
+                ))}
+              </div>
+              <h2 class="mt-4 font-display text-2xl font-extrabold text-ink-900 sm:text-3xl">{p.title}</h2>
+              <p class="mt-1 text-sm font-semibold uppercase tracking-wide text-amber-deep">{p.location}</p>
+              <p class="mt-4 flex-1 leading-relaxed text-ink-600">{p.summary}</p>
+              <div class="mt-6 grid grid-cols-4 gap-3 border-t border-ink-900/10 pt-6">
+                {p.stats.map((s) => (
+                  <div>
+                    <p class="font-display text-xl font-extrabold text-ink-900">{s.value}</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-wide text-ink-500">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="bg-amber-core">
+    <div class="container-edge flex flex-col items-center justify-between gap-6 py-12 text-center md:flex-row md:text-left">
+      <div>
+        <h2 class="font-display text-3xl font-black uppercase text-ink-950">Your project could be next.</h2>
+        <p class="mt-2 text-ink-900/80">Big or small, residential or commercial — we'll quote it upfront.</p>
+      </div>
+      <button @click="$dispatch('open-booking')" class="btn-dark">
+        Start Your Project <Icon name="arrow-right" class="h-4 w-4" />
+      </button>
+    </div>
+  </section>
+</Layout>
