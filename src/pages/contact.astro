@@ -5,6 +5,10 @@ import Icon from '../components/Icon.astro';
 import { business, services } from '../data/site';
 
 const estimatorItems = services.map((s) => ({ title: s.title, icon: s.icon }));
+
+// Web3Forms access key — safe to expose in the frontend (that's how Web3Forms works).
+// Set it in a `.env` file as PUBLIC_WEB3FORMS_KEY=xxxxxxxx-xxxx-... (get it free at web3forms.com).
+const web3formsKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? 'YOUR_WEB3FORMS_ACCESS_KEY';
 ---
 
 <Layout
@@ -63,10 +67,48 @@ const estimatorItems = services.map((s) => ({ title: s.title, icon: s.icon }));
             priceRanges: ['$89–$129','$179–$249','$289–$369','$399–$489','$519–$649'],
             accessFee: { driveway: 0, indoor: 0, stairs: 0, basement: 0 },
             submitted: false,
+            sending: false,
+            error: '',
+            botcheck: '',
             toggle(i){ this.items.includes(i) ? this.items = this.items.filter(x=>x!==i) : this.items.push(i) },
             next(){ if(this.step < this.maxStep) this.step++ },
             back(){ if(this.step > 1) this.step-- },
-            submit(){ this.submitted = true },
+            async submit(){
+              if (this.sending) return;
+              this.sending = true;
+              this.error = '';
+              try {
+                const res = await fetch('https://api.web3forms.com/submit', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                  body: JSON.stringify({
+                    access_key: '${web3formsKey}',
+                    subject: 'New Quote Request — ClearOut Junk Removal',
+                    from_name: 'ClearOut Website',
+                    botcheck: this.botcheck,
+                    name: this.form.name,
+                    email: this.form.email,
+                    phone: this.form.phone,
+                    pickup_zip: this.form.zip,
+                    items: this.items.length ? this.items.join(', ') : 'General junk',
+                    truckload: this.loadLabels[this.load],
+                    estimated_price: this.priceRanges[this.load],
+                    location_access: this.access,
+                    urgency: this.urgency,
+                  }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                  this.submitted = true;
+                } else {
+                  this.error = data.message || 'Something went wrong. Please call us instead.';
+                }
+              } catch (e) {
+                this.error = 'Network error — please call us at the number above.';
+              } finally {
+                this.sending = false;
+              }
+            },
           }`}
         >
           <!-- Progress header -->
@@ -223,12 +265,24 @@ const estimatorItems = services.map((s) => ({ title: s.title, icon: s.icon }));
               <a href={business.phoneHref} class="btn-amber mt-6">Or call us now</a>
             </div>
 
+            <!-- Honeypot (spam trap) — hidden from real users -->
+            <input type="checkbox" x-model="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+            <!-- Error message -->
+            <p x-show="error" x-cloak class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700" x-text="error"></p>
+
             <!-- Controls -->
             <div class="mt-7 flex items-center justify-between" x-show="!submitted">
-              <button @click="back()" x-show="step > 1" class="text-sm font-semibold text-ink-600 hover:text-ink-900">← Back</button>
+              <button @click="back()" x-show="step > 1" :disabled="sending" class="text-sm font-semibold text-ink-600 hover:text-ink-900">← Back</button>
               <div x-show="step === 1"></div>
               <button @click="next()" x-show="step < maxStep" class="btn-amber ml-auto px-6 py-2.5">Continue</button>
-              <button @click="submit()" x-show="step === maxStep" class="btn-amber ml-auto px-6 py-2.5">Get My Quote</button>
+              <button @click="submit()" x-show="step === maxStep" :disabled="sending" :class="sending && 'cursor-wait opacity-70'" class="btn-amber ml-auto px-6 py-2.5">
+                <span x-show="!sending">Get My Quote</span>
+                <span x-show="sending" x-cloak class="inline-flex items-center gap-2">
+                  <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+                  Sending…
+                </span>
+              </button>
             </div>
           </div>
         </div>

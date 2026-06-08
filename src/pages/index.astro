@@ -287,10 +287,11 @@ const reviews = [
                 <span class="absolute left-4 top-4 rounded-full bg-amber-core/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-950">
                   {s.category}
                 </span>
-                <span class="absolute -bottom-6 left-5 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-core text-ink-950 shadow-lg">
-                  <Icon name={s.icon} class="h-6 w-6" />
-                </span>
               </div>
+              <!-- Floating icon — sits on the card (not the clipped image) so it never gets cut off -->
+              <span class="absolute left-5 top-36 z-10 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-core text-ink-950 shadow-lg ring-4 ring-ink-900">
+                <Icon name={s.icon} class="h-6 w-6" />
+              </span>
               <div class="flex flex-1 flex-col p-6 pt-8">
                 <h3 class="font-display text-lg font-bold text-white">{s.title}</h3>
                 <p class="mt-2 flex-1 text-sm text-white/60">{s.blurb}</p>
